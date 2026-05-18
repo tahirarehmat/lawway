@@ -88,6 +88,8 @@ export default function Home() {
       </main>
 
       <LandingFooter />
+
+      <LandingSupportWidget />
     </div>
   );
 }
