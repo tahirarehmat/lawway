@@ -1,11 +1,8 @@
 "use client";
 
-import { useCallback, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Loader2, MapPin, MessageCircle, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import type { SessionPayload } from "@/lib/session";
-import type { LawyerSearchResult } from "@/lib/lawyers";
-import { fetchLawyers } from "@/lib/lawyer-search-api";
 import { DashboardShell } from "@/app/components/layout/dashboard-shell";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,209 +30,34 @@ const ACTIVE_CASES = [
   },
 ];
 
-function formatExperience(years: number | null): string {
-  if (years == null) return "—";
-  return `${years} Year${years === 1 ? "" : "s"}`;
-}
-
-function formatLocation(lawyer: LawyerSearchResult): string {
-  if (lawyer.officeAddress) {
-    return `${lawyer.province} · ${lawyer.officeAddress}`;
-  }
-  return lawyer.province;
-}
-
-function LawyerResultRow({ lawyer }: { lawyer: LawyerSearchResult }) {
-  return (
-    <div className="grid gap-3 border-b border-black/5 px-4 py-4 last:border-0 sm:grid-cols-[minmax(140px,1.2fr)_minmax(90px,0.7fr)_minmax(160px,1.5fr)_minmax(140px,1fr)_auto] sm:items-center sm:gap-4 sm:px-5">
-      <p className="font-medium text-secondary">{lawyer.fullName}</p>
-      <p className="text-sm text-neutral/70">
-        <span className="font-medium text-neutral/45 sm:hidden">Experience: </span>
-        {formatExperience(lawyer.experienceYears)}
-      </p>
-      <p className="min-w-0 text-sm text-neutral/70">
-        <span className="font-medium text-neutral/45 sm:hidden">Specialization: </span>
-        {lawyer.specialization}
-      </p>
-      <p className="min-w-0 text-sm text-neutral/70">
-        <span className="font-medium text-neutral/45 sm:hidden">Location: </span>
-        {formatLocation(lawyer)}
-      </p>
-      <div className="flex flex-wrap gap-2 sm:justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-9 gap-1.5 border-black/10 text-secondary hover:bg-black/[0.03]"
-        >
-          <MessageCircle className="size-3.5" aria-hidden />
-          Chat
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          className="h-9 bg-secondary text-white hover:bg-secondary/90"
-        >
-          Book Consultation
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 export function ClientDashboard({ session }: ClientDashboardProps) {
-  const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [lawyers, setLawyers] = useState<LawyerSearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasSearched, setHasSearched] = useState(false);
-
-  const loadLawyers = useCallback(
-    async (opts: { query?: string; location?: string }) => {
-      setSearching(true);
-      setError(null);
-
-      try {
-        const results = await fetchLawyers({
-          query: opts.query,
-          location: opts.location,
-        });
-        setLawyers(results);
-      } catch (err) {
-        setLawyers([]);
-        setError(err instanceof Error ? err.message : "Search failed.");
-      } finally {
-        setSearching(false);
-      }
-    },
-    [],
-  );
-
-  async function handleSearch(e?: FormEvent) {
-    e?.preventDefault();
-    const q = query.trim();
-    const loc = location.trim();
-
-    if (!q && !loc) {
-      setError("Enter a name, specialization, or location to search.");
-      return;
-    }
-
-    setHasSearched(true);
-    await loadLawyers({ query: q, location: loc });
-  }
-
-  function clearSearch() {
-    setQuery("");
-    setLocation("");
-    setHasSearched(false);
-    setLawyers([]);
-    setError(null);
-  }
-
   return (
     <DashboardShell session={session} activeItem="Home">
       <main className="px-4 py-8 sm:px-8">
         <section className="mb-10">
           <h1 className="font-serif text-3xl font-medium tracking-tight text-secondary sm:text-4xl">
-            Find Uncompromising Legal Authority
+            Welcome back
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-neutral/70 sm:text-base">
-            Access Pakistan&apos;s most distinguished legal professionals and
-            manage your cases with precision and discretion.
+            Manage your active cases, upcoming hearings, and legal updates from
+            one place.
           </p>
 
-          <form
-            onSubmit={handleSearch}
-            className="mt-6 flex flex-col gap-3 rounded-2xl border border-black/5 bg-white p-2 shadow-sm sm:flex-row sm:items-center"
+          <Link
+            href="/dashboard/search"
+            className="mt-6 flex flex-col gap-3 rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition hover:border-primary/30 hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
           >
-            <div className="relative flex flex-[1.2] items-center">
-              <Search className="absolute left-3 size-4 text-neutral/40" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Specialization or Attorney name"
-                className="w-full border-none bg-transparent py-3 pr-4 pl-10 text-sm outline-none placeholder:text-neutral/40 focus:ring-0"
-              />
+            <div>
+              <p className="font-medium text-secondary">Find a lawyer</p>
+              <p className="mt-1 text-sm text-neutral/60">
+                Search advocates by specialization, name, or location.
+              </p>
             </div>
-            <div className="hidden h-8 w-px bg-black/10 sm:block" />
-            <div className="relative flex flex-1 items-center">
-              <MapPin className="absolute left-3 size-4 text-neutral/40" />
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Location"
-                className="w-full border-none bg-transparent py-3 pr-4 pl-10 text-sm outline-none placeholder:text-neutral/40 focus:ring-0"
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={searching}
-              className="h-11 shrink-0 rounded-lg bg-secondary px-8 text-white hover:bg-secondary/90"
-            >
-              {searching ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Searching
-                </>
-              ) : (
-                "Search"
-              )}
-            </Button>
-          </form>
-
-          {error ? (
-            <p className="mt-3 text-sm text-rose-600" role="alert">
-              {error}
-            </p>
-          ) : null}
-
-          {hasSearched ? (
-            <div className="mt-6 overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm">
-              <div className="hidden border-b border-black/5 bg-[#faf9f7] px-5 py-3 text-[11px] font-medium tracking-wide text-neutral/50 uppercase sm:grid sm:grid-cols-[minmax(140px,1.2fr)_minmax(90px,0.7fr)_minmax(160px,1.5fr)_minmax(140px,1fr)_auto] sm:gap-4">
-                <span>Name</span>
-                <span>Experience</span>
-                <span>Specialization</span>
-                <span>Location</span>
-                <span className="text-right">Actions</span>
-              </div>
-
-              {searching ? (
-                <div className="flex items-center justify-center gap-2 px-4 py-12 text-sm text-neutral/60">
-                  <Loader2 className="size-5 animate-spin text-primary" />
-                  Searching lawyers…
-                </div>
-              ) : lawyers.length === 0 ? (
-                <div className="px-6 py-12 text-center">
-                  <p className="font-medium text-secondary">No lawyers found</p>
-                  <p className="mt-2 text-sm text-neutral/60">
-                    Try a different name, specialization, or location.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between border-b border-black/5 px-5 py-3">
-                    <p className="text-sm font-medium text-secondary">
-                      {lawyers.length} result{lawyers.length === 1 ? "" : "s"}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={clearSearch}
-                      className="text-xs font-medium text-primary hover:text-primary/80"
-                    >
-                      Clear search
-                    </button>
-                  </div>
-                  {lawyers.map((lawyer) => (
-                    <LawyerResultRow key={lawyer.userId} lawyer={lawyer} />
-                  ))}
-                </>
-              )}
-            </div>
-          ) : null}
+            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+              Open search
+              <ArrowRight className="size-4" aria-hidden />
+            </span>
+          </Link>
         </section>
 
         <section className="mb-10 grid gap-6 lg:grid-cols-3">

@@ -3,17 +3,14 @@
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import type { SessionPayload } from "@/lib/session";
 import { Navbar } from "@/app/components/layout/navbar";
-import { Sidebar } from "@/app/components/layout/sidebar";
+import {
+  Sidebar,
+  type SidebarNavLabel,
+} from "@/app/components/layout/sidebar";
 
 type DashboardShellProps = {
   session: SessionPayload;
-  activeItem?:
-    | "Home"
-    | "My Cases"
-    | "Hearing Calendar"
-    | "Legal AI"
-    | "Documents"
-    | "Support";
+  activeItem?: SidebarNavLabel;
   showSupport?: boolean;
   children: ReactNode;
 };
@@ -36,14 +33,17 @@ export function DashboardShell({
 
   return (
     <div className="flex h-screen overflow-hidden bg-tertiary">
-      <Sidebar activeItem={activeItem} collapsed={collapsed} />
+      <Sidebar
+        role={session.role === "client" ? "client" : "lawyer"}
+        activeItem={activeItem}
+        collapsed={collapsed}
+        onToggle={() => setCollapsed((prev) => !prev)}
+      />
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar
           email={session.email}
           showSupport={showSupport}
           scrolled={scrolled}
-          sidebarCollapsed={collapsed}
-          onToggleSidebar={() => setCollapsed((prev) => !prev)}
         />
         <div
           ref={scrollRef}

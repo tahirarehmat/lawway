@@ -3,6 +3,7 @@ import { getPool } from "@/lib/db";
 export type LawyerSearchResult = {
   userId: string;
   fullName: string;
+  phone: string;
   specialization: string;
   province: string;
   officeAddress: string;
@@ -15,12 +16,20 @@ export type LawyerSearchResult = {
 type SearchLawyersParams = {
   query?: string;
   location?: string;
+  province?: string;
+  specialization?: string;
+  experienceMin?: number;
+  experienceMax?: number;
   limit?: number;
 };
 
 export async function searchLawyers({
   query,
   location,
+  province,
+  specialization,
+  experienceMin,
+  experienceMax,
   limit = 24,
 }: SearchLawyersParams): Promise<LawyerSearchResult[]> {
   const pool = getPool();
@@ -31,7 +40,7 @@ export async function searchLawyers({
     "u.role = 'lawyer'",
     "u.is_active = true",
   ];
-  const params: string[] = [];
+  const params: (string | number)[] = [];
   let paramIndex = 1;
 
   if (q) {
@@ -50,11 +59,36 @@ export async function searchLawyers({
     paramIndex++;
   }
 
+  if (province) {
+    conditions.push(`lp.province::text = $${paramIndex}`);
+    params.push(province);
+    paramIndex++;
+  }
+
+  if (specialization) {
+    conditions.push(`lp.specialization = $${paramIndex}`);
+    params.push(specialization);
+    paramIndex++;
+  }
+
+  if (experienceMin != null) {
+    conditions.push(`lp.experience_years >= $${paramIndex}`);
+    params.push(experienceMin);
+    paramIndex++;
+  }
+
+  if (experienceMax != null) {
+    conditions.push(`lp.experience_years <= $${paramIndex}`);
+    params.push(experienceMax);
+    paramIndex++;
+  }
+
   params.push(String(limit));
 
   const result = await pool.query<{
     user_id: string;
     full_name: string;
+    phone: string;
     specialization: string;
     province: string;
     office_address: string;
@@ -66,6 +100,7 @@ export async function searchLawyers({
     `SELECT
        lp.user_id,
        lp.full_name,
+       lp.phone,
        lp.specialization,
        lp.province::text AS province,
        lp.office_address,
@@ -84,6 +119,7 @@ export async function searchLawyers({
   return result.rows.map((row) => ({
     userId: row.user_id,
     fullName: row.full_name,
+    phone: row.phone,
     specialization: row.specialization,
     province: row.province,
     officeAddress: row.office_address,

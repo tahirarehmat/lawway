@@ -8,16 +8,29 @@ type SearchLawyersError = {
   error: string;
 };
 
-export async function fetchLawyers(options?: {
+export type LawyerSearchFilters = {
   query?: string;
   location?: string;
-}): Promise<LawyerSearchResult[]> {
+  province?: string;
+  specialization?: string;
+  experience?: string;
+};
+
+export async function fetchLawyers(
+  options?: LawyerSearchFilters,
+): Promise<LawyerSearchResult[]> {
   const params = new URLSearchParams();
   const query = options?.query?.trim() ?? "";
   const location = options?.location?.trim() ?? "";
+  const province = options?.province?.trim() ?? "";
+  const specialization = options?.specialization?.trim() ?? "";
+  const experience = options?.experience?.trim() ?? "";
 
   if (query) params.set("q", query);
   if (location) params.set("location", location);
+  if (province) params.set("province", province);
+  if (specialization) params.set("specialization", specialization);
+  if (experience) params.set("experience", experience);
 
   const qs = params.toString();
   const response = await fetch(`/api/lawyers/search${qs ? `?${qs}` : ""}`);

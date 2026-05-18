@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/auth";
+import {
+  isValidExperienceFilter,
+  isValidProvince,
+  isValidSpecialization,
+  parseExperienceFilter,
+} from "@/lib/lawyer-search-filters";
 import { searchLawyers } from "@/lib/lawyers";
 
 export async function GET(request: Request) {
@@ -13,15 +19,52 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") ?? undefined;
     const location = searchParams.get("location") ?? undefined;
+    const province = searchParams.get("province") ?? undefined;
+    const specialization = searchParams.get("specialization") ?? undefined;
+    const experience = searchParams.get("experience") ?? undefined;
 
     const q = query?.trim() ?? "";
     const loc = location?.trim() ?? "";
-    const hasFilters = Boolean(q || loc);
+    const provinceValue = province?.trim() ?? "";
+    const specializationValue = specialization?.trim() ?? "";
+    const experienceValue = experience?.trim() ?? "";
+
+    if (provinceValue && !isValidProvince(provinceValue)) {
+      return NextResponse.json({ error: "Invalid province filter." }, { status: 400 });
+    }
+
+    if (specializationValue && !isValidSpecialization(specializationValue)) {
+      return NextResponse.json(
+        { error: "Invalid lawyer type filter." },
+        { status: 400 },
+      );
+    }
+
+    if (experienceValue && !isValidExperienceFilter(experienceValue)) {
+      return NextResponse.json(
+        { error: "Invalid experience filter." },
+        { status: 400 },
+      );
+    }
+
+    const { minYears, maxYears } = parseExperienceFilter(experienceValue);
+
+    const hasFilters = Boolean(
+      q ||
+        loc ||
+        provinceValue ||
+        specializationValue ||
+        experienceValue,
+    );
 
     const lawyers = await searchLawyers({
       query: q || undefined,
       location: loc || undefined,
-      limit: hasFilters ? 24 : 6,
+      province: provinceValue || undefined,
+      specialization: specializationValue || undefined,
+      experienceMin: minYears,
+      experienceMax: maxYears,
+      limit: hasFilters ? 48 : 6,
     });
 
     return NextResponse.json({ lawyers });

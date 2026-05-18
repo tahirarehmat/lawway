@@ -10,8 +10,10 @@ import {
   LayoutGrid,
   LifeBuoy,
   LogOut,
+  DoorClosed,
   Plus,
   Scale,
+  Search,
   Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,21 +21,61 @@ import { logoutUser } from "@/lib/logout";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const NAV_ITEMS = [
+const SHARED_NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: LayoutGrid },
-  { label: "Support", href: "/dashboard/tickets", icon: LifeBuoy },
   { label: "My Cases", href: "#", icon: Briefcase },
   { label: "Hearing Calendar", href: "#", icon: Calendar },
   { label: "Legal AI", href: "#", icon: Bot },
   { label: "Documents", href: "#", icon: FileText },
 ] as const;
 
+const CLIENT_NAV_ITEMS = [
+  { label: "Search", href: "/dashboard/search", icon: Search },
+  { label: "Support", href: "/dashboard/tickets", icon: LifeBuoy },
+] as const;
+
+export type SidebarNavLabel =
+  | (typeof SHARED_NAV_ITEMS)[number]["label"]
+  | (typeof CLIENT_NAV_ITEMS)[number]["label"];
+
 type SidebarProps = {
-  activeItem?: (typeof NAV_ITEMS)[number]["label"];
+  role?: "client" | "lawyer";
+  activeItem?: SidebarNavLabel;
   collapsed?: boolean;
+  onToggle?: () => void;
 };
 
-export function Sidebar({ activeItem = "Home", collapsed = false }: SidebarProps) {
+function SidebarCollapseButton({ onCollapse }: { onCollapse: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onCollapse();
+      }}
+      className="group flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] text-white/80 transition hover:border-primary/50 hover:bg-white/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      aria-label="Collapse sidebar"
+      aria-expanded
+    >
+      <DoorClosed className="size-[1.125rem] transition group-hover:scale-105" aria-hidden />
+    </button>
+  );
+}
+
+export function Sidebar({
+  role = "lawyer",
+  activeItem = "Home",
+  collapsed = false,
+  onToggle,
+}: SidebarProps) {
+  const navItems =
+    role === "client"
+      ? [
+          SHARED_NAV_ITEMS[0],
+          ...CLIENT_NAV_ITEMS,
+          ...SHARED_NAV_ITEMS.slice(1),
+        ]
+      : [...SHARED_NAV_ITEMS];
   const router = useRouter();
 
   async function handleLogout() {
@@ -51,28 +93,44 @@ export function Sidebar({ activeItem = "Home", collapsed = false }: SidebarProps
 
   return (
     <aside
+      onClick={collapsed && onToggle ? onToggle : undefined}
+      onKeyDown={
+        collapsed && onToggle
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onToggle();
+              }
+            }
+          : undefined
+      }
+      role={collapsed ? "button" : undefined}
+      tabIndex={collapsed ? 0 : undefined}
+      aria-label={collapsed ? "Expand sidebar" : undefined}
       className={cn(
         "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-[#523d39] bg-secondary text-white transition-[width] duration-300 ease-in-out lg:flex",
-        collapsed ? "w-[4.75rem]" : "w-64",
+        collapsed ? "w-[4.75rem] cursor-pointer" : "w-64",
       )}
     >
       <div
         className={cn(
           "border-b border-white/10",
-          collapsed ? "flex justify-center px-3 py-5" : "px-6 py-6",
+          collapsed
+            ? "flex justify-center px-3 py-4"
+            : "flex items-start justify-between gap-2 px-4 py-5",
         )}
       >
         <div
           className={cn(
-            "flex items-center",
-            collapsed ? "justify-center" : "items-start gap-3",
+            "flex min-w-0 items-center",
+            collapsed ? "justify-center" : "gap-3",
           )}
         >
           <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary">
             <Scale className="size-5 text-secondary" />
           </div>
           {!collapsed && (
-            <div>
+            <div className="min-w-0">
               <p className="font-serif text-lg font-medium text-primary">
                 Lawway Portal
               </p>
@@ -82,6 +140,9 @@ export function Sidebar({ activeItem = "Home", collapsed = false }: SidebarProps
             </div>
           )}
         </div>
+        {!collapsed && onToggle ? (
+          <SidebarCollapseButton onCollapse={onToggle} />
+        ) : null}
       </div>
 
       <div
@@ -108,7 +169,7 @@ export function Sidebar({ activeItem = "Home", collapsed = false }: SidebarProps
         </Button>
 
         <nav className={cn("space-y-1", collapsed ? "mt-4 w-full" : "mt-6 w-full")}>
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = item.label === activeItem;
 
             return (
@@ -154,7 +215,7 @@ export function Sidebar({ activeItem = "Home", collapsed = false }: SidebarProps
           </Link>
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => void handleLogout()}
             title="Logout"
             aria-label="Logout"
             className={cn(
