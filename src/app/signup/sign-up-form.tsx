@@ -32,10 +32,14 @@ function validatePassword(password: string): string | null {
   return null;
 }
 
-export function SignUpForm() {
+type SignUpFormProps = {
+  initialRole?: UserRole;
+};
+
+export function SignUpForm({ initialRole }: SignUpFormProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<UserRole>("client");
+  const [role, setRole] = useState<UserRole>(initialRole ?? "client");
   const [error, setError] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
