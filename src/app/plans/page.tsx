@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpCircle, Coins, HardDrive, Mail } from "lucide-react";
-import { SiteHeader } from "@/components/layout/site-header";
-import { LawwayLogo } from "@/components/lawway-logo";
+// import { SiteHeader } from "@/components/layout/site-header";
+// import { LawwayLogo } from "@/components/lawway-logo";
 import { PlansSection } from "@/components/plans/plans-section";
 
 export const metadata: Metadata = {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function PlansPage() {
   return (
     <div className="flex min-h-full flex-col bg-[#FCF9F6] text-[#2c2c2c]">
-      <SiteHeader activePath="/plans" />
+      {/* <SiteHeader activePath="/plans" /> */}
 
       <main className="flex flex-1 flex-col">
         <section className="px-6 pb-12 pt-4 text-center sm:px-10 lg:px-14 lg:pb-8">
@@ -96,7 +96,7 @@ export default function PlansPage() {
         </section>
       </main>
 
-      <footer className="border-t border-[#ebe7e2] bg-[#FAF9F6] px-6 py-12 sm:py-10 lg:px-14">
+      {/* <footer className="border-t border-[#ebe7e2] bg-[#FAF9F6] px-6 py-12 sm:py-10 lg:px-14">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 text-center sm:grid-cols-[1fr_auto_1fr] sm:gap-6">
           <Link
             href="/"
@@ -111,7 +111,7 @@ export default function PlansPage() {
           </p>
           <span className="hidden sm:block" aria-hidden />
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

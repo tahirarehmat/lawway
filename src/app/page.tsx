@@ -4,8 +4,8 @@ import { ArrowRight } from "lucide-react";
 import { AiAssistantSection } from "@/components/landing/ai-assistant-section";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { PlatformFeaturesSection } from "@/components/landing/platform-features-section";
-// import { PricingSection } from "@/components/landing/pricing-section";
 import { LandingFooter } from "@/components/landing/landing-footer";
+import PlansPage from "@/app/plans/page";
 
 export default function Home() {
   return (
@@ -80,7 +80,7 @@ export default function Home() {
 
         <PlatformFeaturesSection />
 
-        {/* <PricingSection /> */}
+        <PlansPage />
 
         <AiAssistantSection />
       </main>
