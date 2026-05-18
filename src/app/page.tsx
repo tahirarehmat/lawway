@@ -1,65 +1,123 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { AiAssistantSection } from "@/components/landing/ai-assistant-section";
+import { PlatformFeaturesSection } from "@/components/landing/platform-features-section";
+import { LawwayLogo } from "@/components/lawway-logo";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex min-h-full flex-col bg-[#FCF9F6] text-[#2c2c2c]">
+      <header className="flex items-center justify-between gap-6 px-6 py-8 sm:px-10 lg:px-14">
+        <Link
+          href="/"
+          className="flex items-center gap-3 opacity-95 transition hover:opacity-100"
+          aria-label="Lawway Chambers home"
+        >
+          <LawwayLogo className="h-11 w-auto sm:h-12" />
+          <span className="font-serif text-xl tracking-tight text-secondary sm:text-2xl">
+            Lawway
+          </span>
+        </Link>
+        <nav className="flex items-center gap-4 sm:gap-6">
+          <Link
+            href="/signin"
+            className="text-sm font-medium text-[#5c534c] transition hover:text-secondary"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="rounded-[4px] bg-secondary px-4 py-2.5 text-sm font-semibold tracking-wide text-[#FCF9F6] transition hover:bg-secondary/90 sm:px-5"
           >
-            Documentation
-          </a>
-        </div>
+            Get started
+          </Link>
+        </nav>
+      </header>
+
+      <main className="flex flex-1 flex-col">
+        <section className="px-6 pb-16 pt-4 sm:px-10 lg:px-14 lg:pb-24 lg:pt-8">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+            <div className="flex flex-col justify-center lg:py-8">
+              <p className="mb-6 font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+                The authority in digital jurisprudence
+              </p>
+              <h1 className="font-serif text-[2rem] font-semibold leading-[1.12] tracking-tight text-secondary sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
+                Modern Legal Solutions{" "}
+                <span className="font-normal italic text-primary">
+                  Refined
+                </span>{" "}
+                for Excellence.
+              </h1>
+              <p className="mt-6 max-w-xl font-sans text-base leading-relaxed text-[#5c534c] sm:text-lg">
+                A centralized ecosystem where legal expertise meets modern
+                precision. Manage high-stakes cases, access streamlined research,
+                and collaborate with absolute security.
+              </p>
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <Link
+                  href="/signup?role=lawyer"
+                  className="inline-flex items-center justify-center gap-2 rounded-[4px] bg-secondary px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-[#FCF9F6] transition hover:bg-secondary/90"
+                >
+                  Join as a Lawyer
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+                <Link
+                  href="/signup?role=client"
+                  className="inline-flex items-center justify-center rounded-[4px] border border-primary bg-transparent px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-primary transition hover:bg-primary/10"
+                >
+                  Register as a Client
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:justify-self-end">
+              <div className="relative overflow-hidden rounded-lg shadow-[0_24px_60px_-12px_rgba(46,39,35,0.35)]">
+                <Image
+                  src="/hero-office.png"
+                  alt="Executive chambers office with desk and leather chair"
+                  width={720}
+                  height={960}
+                  className="aspect-[3/4] w-full object-cover sm:aspect-[4/5]"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
+                <div className="absolute bottom-6 left-6 max-w-[min(calc(100%-3rem),280px)] rounded-lg border border-black/[0.06] bg-white p-5 shadow-lg">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
+                    Upcoming Session
+                  </p>
+                  <p className="mt-2 font-serif text-lg font-semibold text-secondary">
+                    Supreme Court Hearing
+                  </p>
+                  <p className="mt-1 font-sans text-xs text-[#8f8378]">
+                    Tomorrow, 10:00 AM EST
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <AiAssistantSection />
+
+        <PlatformFeaturesSection />
       </main>
+
+      <footer className="border-t border-[#ebe7e2] bg-[#FAF9F6] px-6 py-12 sm:py-10 lg:px-14">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 text-center sm:grid-cols-[1fr_auto_1fr] sm:gap-6">
+          <Link
+            href="/"
+            className="justify-self-center transition-opacity hover:opacity-90 sm:justify-self-start"
+            aria-label="Lawway Chambers home"
+          >
+            <LawwayLogo className="h-9 w-auto" />
+          </Link>
+          <p className="text-xs tracking-wide text-[#8f8378]">
+            © {new Date().getFullYear()} Lawway Chambers. All rights reserved.
+          </p>
+          <span className="hidden sm:block" aria-hidden />
+        </div>
+      </footer>
     </div>
   );
 }
