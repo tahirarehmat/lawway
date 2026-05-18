@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { SignInForm } from "./sign-in-form";
+import { SignUpForm } from "./sign-up-form";
 
 function BrandDecoration() {
   return (
@@ -11,7 +11,7 @@ function BrandDecoration() {
   );
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <div className="flex min-h-full flex-1 flex-col bg-signin-page-bg text-signin-text">
       <main className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
@@ -32,14 +32,14 @@ export default function SignInPage() {
                 Chambers of Excellence
               </h1>
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-signin-text">
-                Access your secure legal environment and manage your cases with
-                precision.
+                Create your account and connect with trusted legal professionals
+                across Pakistan.
               </p>
               <BrandDecoration />
             </section>
 
             <section className="border-t border-signin-border/50 lg:border-t-0 lg:border-l">
-              <SignInForm />
+              <SignUpForm />
             </section>
           </div>
         </div>
