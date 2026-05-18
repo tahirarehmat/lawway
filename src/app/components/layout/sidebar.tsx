@@ -8,6 +8,7 @@ import {
   Calendar,
   FileText,
   LayoutGrid,
+  LifeBuoy,
   LogOut,
   Plus,
   Scale,
@@ -20,6 +21,7 @@ import { toast } from "sonner";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: LayoutGrid },
+  { label: "Support", href: "/dashboard/tickets", icon: LifeBuoy },
   { label: "My Cases", href: "#", icon: Briefcase },
   { label: "Hearing Calendar", href: "#", icon: Calendar },
   { label: "Legal AI", href: "#", icon: Bot },

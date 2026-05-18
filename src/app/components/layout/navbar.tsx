@@ -47,7 +47,7 @@ export function Navbar({
       <div className="flex items-center gap-3 sm:gap-4">
         {showSupport && (
           <Link
-            href="#"
+            href="/dashboard/tickets"
             className={cn(
               "hidden text-sm transition sm:block",
               scrolled

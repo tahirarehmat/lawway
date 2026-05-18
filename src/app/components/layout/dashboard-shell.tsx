@@ -7,7 +7,13 @@ import { Sidebar } from "@/app/components/layout/sidebar";
 
 type DashboardShellProps = {
   session: SessionPayload;
-  activeItem?: "Home" | "My Cases" | "Hearing Calendar" | "Legal AI" | "Documents";
+  activeItem?:
+    | "Home"
+    | "My Cases"
+    | "Hearing Calendar"
+    | "Legal AI"
+    | "Documents"
+    | "Support";
   showSupport?: boolean;
   children: ReactNode;
 };
