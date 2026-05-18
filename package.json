@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "node --env-file=.env scripts/migrate-core.mjs"
   },
   "dependencies": {
+    "@base-ui/react": "^1.4.1",
     "@base-ui/react": "^1.4.1",
     "@cyntler/react-doc-viewer": "^1.17.0",
     "@google/generative-ai": "^0.24.1",
@@ -41,6 +43,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ws": "^8.20.1"
   }
 }

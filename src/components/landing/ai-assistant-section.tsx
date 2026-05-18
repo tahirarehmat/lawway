@@ -40,8 +40,8 @@ const chatPreview = [
 export function AiAssistantSection() {
   return (
     <section
-      id="ai-assistant"
-      className="relative overflow-hidden bg-[#FCF9F6] px-6 py-24 sm:px-10 lg:px-14 lg:py-32"
+      id="legal-ai"
+      className="relative scroll-mt-20 overflow-hidden bg-[#FCF9F6] px-6 py-24 sm:px-10 lg:px-14 lg:py-32"
       aria-labelledby="ai-assistant-heading"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden>
