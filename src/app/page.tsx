@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { AiAssistantSection } from "@/components/landing/ai-assistant-section";
 import { PlatformFeaturesSection } from "@/components/landing/platform-features-section";
 import { LawwayLogo } from "@/components/lawway-logo";
+import { LandingSupportWidget } from "@/components/landing/LandingSupportWidget";
 
 export default function Home() {
   return (
@@ -118,6 +119,8 @@ export default function Home() {
           <span className="hidden sm:block" aria-hidden />
         </div>
       </footer>
+
+      <LandingSupportWidget />
     </div>
   );
 }
