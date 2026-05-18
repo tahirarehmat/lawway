@@ -74,7 +74,7 @@ export function PlatformFeaturesSection() {
       aria-labelledby="platform-heading"
     >
       <div className="mx-auto max-w-5xl">
-        <div className="overflow-hidden rounded-2xl border border-signin-border/50 bg-signin-card-bg shadow-[0_8px_60px_-20px_rgba(0,0,0,0.4)]">
+        <div className="overflow-hidden rounded-2xl border border-signin-border/50 bg-signin-card-bg shadow-[0_8px_60px_-20px_rgba(0,0,0,0.4)] ring-1 ring-white/[0.06]">
           <div className="border-b border-signin-border/45 bg-signin-panel-bg/60 px-8 py-10 sm:px-10 sm:py-12 lg:px-14">
             <h2
               id="platform-heading"
@@ -90,13 +90,13 @@ export function PlatformFeaturesSection() {
             </p>
           </div>
 
-          <ul className="grid gap-px bg-signin-border/30 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-px bg-signin-border/40 sm:grid-cols-2 lg:grid-cols-3">
             {platformFeatures.map(({ icon: Icon, title, description }) => (
               <li
                 key={title}
-                className="flex gap-4 bg-signin-card-bg/95 p-6 sm:p-7 lg:p-8"
+                className="flex gap-4 bg-signin-card-bg/95 p-6 transition-colors hover:bg-white/[0.04] sm:p-7 lg:p-8"
               >
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-signin-border/50 bg-signin-panel-bg/80">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-signin-panel-bg/80">
                   <Icon
                     className="size-5 text-[#E9C349]"
                     strokeWidth={1.45}
@@ -115,7 +115,7 @@ export function PlatformFeaturesSection() {
             ))}
           </ul>
 
-          <div className="flex flex-col items-start justify-between gap-4 border-t border-signin-border/45 bg-signin-panel-bg/40 px-8 py-6 sm:flex-row sm:items-center sm:px-10 lg:px-14">
+          <div className="flex flex-col items-start justify-between gap-4 border-t border-white/10 bg-signin-panel-bg/40 px-8 py-6 sm:flex-row sm:items-center sm:px-10 lg:px-14">
             <p className="text-sm text-signin-text-muted">
               Ready to bring your matters onto Lawway?
             </p>

@@ -64,13 +64,13 @@ export default function Home() {
                 />
                 <div className="absolute bottom-6 left-6 max-w-[min(calc(100%-3rem),280px)] rounded-lg border border-black/[0.06] bg-white p-5 shadow-lg">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">
-                    Upcoming Session
+                    Lawway Chambers
                   </p>
                   <p className="mt-2 font-serif text-lg font-semibold text-secondary">
-                    Supreme Court Hearing
+                    Your Virtual Chambers
                   </p>
                   <p className="mt-1 font-sans text-xs text-[#8f8378]">
-                    Tomorrow, 10:00 AM EST
+                    Secure access from any device
                   </p>
                 </div>
               </div>
