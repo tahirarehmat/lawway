@@ -103,7 +103,8 @@ export function LawyerSignupForm() {
       });
       sessionStorage.removeItem(PENDING_SIGNUP_KEY);
       toast.success("Account created successfully");
-      router.push("/signin");
+      router.push("/dashboard");
+      router.refresh();
     } catch (submitError) {
       setError(
         submitError instanceof Error

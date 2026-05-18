@@ -1,5 +1,10 @@
 import { getPool } from "@/lib/db";
 import { PROVINCES } from "@/lib/auth-form";
+import {
+  createSessionToken,
+  SESSION_COOKIE_NAME,
+  type SessionPayload,
+} from "@/lib/session";
 import { NextResponse } from "next/server";
 
 const EMAIL_PATTERN =
@@ -271,7 +276,13 @@ export async function POST(request: Request) {
 
       await client.query("COMMIT");
 
-      return NextResponse.json(
+      const session: SessionPayload = {
+        userId,
+        email: parsed.email,
+        role: parsed.role,
+      };
+
+      const response = NextResponse.json(
         {
           message: "Account created successfully.",
           userId,
@@ -279,6 +290,16 @@ export async function POST(request: Request) {
         },
         { status: 201 },
       );
+
+      response.cookies.set(SESSION_COOKIE_NAME, createSessionToken(session), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+
+      return response;
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("Signup error:", error);

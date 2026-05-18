@@ -57,7 +57,7 @@ export function SignInForm() {
       }
 
       toast.success("Signed in successfully");
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
     } catch (submitError) {
       setError(
