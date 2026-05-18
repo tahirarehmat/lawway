@@ -5,19 +5,20 @@ import { useRouter } from "next/navigation";
 import {
   Award,
   Briefcase,
-  ChevronDown,
   FileText,
   Hash,
   ImagePlus,
   MapPin,
 } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
+import { AuthSelect } from "@/components/auth-select";
 import {
   inputClassName,
   labelClassName,
   PENDING_SIGNUP_KEY,
   PendingSignup,
   PROVINCES,
+  SPECIALIZATIONS,
   textareaClassName,
 } from "@/lib/auth-form";
 import { registerAccount } from "@/lib/signup-api";
@@ -29,6 +30,8 @@ export function LawyerSignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pending, setPending] = useState<PendingSignup | null>(null);
   const [photoName, setPhotoName] = useState<string | null>(null);
+  const [province, setProvince] = useState("");
+  const [specialization, setSpecialization] = useState("");
 
   useEffect(() => {
     const raw = sessionStorage.getItem(PENDING_SIGNUP_KEY);
@@ -125,7 +128,7 @@ export function LawyerSignupForm() {
   }
 
   return (
-    <div className="flex flex-col justify-center px-8 py-10 sm:max-h-[85vh] sm:overflow-y-auto sm:px-12 lg:px-14">
+    <div className="flex flex-col justify-center px-8 py-10 sm:px-12 lg:px-14">
       <header className="mb-8">
         <h2 className="font-serif text-3xl font-medium tracking-tight text-primary sm:text-4xl">
           Lawyer Profile
@@ -160,52 +163,38 @@ export function LawyerSignupForm() {
           <label htmlFor="province" className={labelClassName}>
             Province / jurisdiction
           </label>
-          <div className="relative">
-            <MapPin
-              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-signin-text-muted"
-              aria-hidden
-            />
-            <select
-              id="province"
-              name="province"
-              required
-              defaultValue=""
-              className={`${inputClassName} appearance-none pr-10 pl-11`}
-            >
-              <option value="" disabled>
-                Select province
-              </option>
-              {PROVINCES.map((province) => (
-                <option key={province} value={province}>
-                  {province}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-signin-text-muted"
-              aria-hidden
-            />
-          </div>
+          <AuthSelect
+            id="province"
+            name="province"
+            value={province}
+            onChange={setProvince}
+            required
+            placeholder="Select province"
+            icon={<MapPin className="size-4" />}
+            options={PROVINCES.map((item) => ({
+              value: item,
+              label: item,
+            }))}
+          />
         </div>
 
         <div>
           <label htmlFor="specialization" className={labelClassName}>
             Specialization
           </label>
-          <div className="relative">
-            <Briefcase
-              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-signin-text-muted"
-              aria-hidden
-            />
-            <input
-              id="specialization"
-              name="specialization"
-              type="text"
-              required
-              placeholder="e.g. Family Law, Criminal, Civil"
-              className={`${inputClassName} pr-4 pl-11`}
-            />
-          </div>
+          <AuthSelect
+            id="specialization"
+            name="specialization"
+            value={specialization}
+            onChange={setSpecialization}
+            required
+            placeholder="Select specialization"
+            icon={<Briefcase className="size-4" />}
+            options={SPECIALIZATIONS.map((item) => ({
+              value: item,
+              label: item,
+            }))}
+          />
         </div>
 
         <div>
@@ -244,7 +233,7 @@ export function LawyerSignupForm() {
           />
         </div>
 
-        <div>
+        {/* <div>
           <label htmlFor="profile_photo" className={labelClassName}>
             Profile photo{" "}
             <span className="normal-case text-signin-text-muted">(optional)</span>
@@ -269,7 +258,7 @@ export function LawyerSignupForm() {
           {photoName ? (
             <p className="mt-1.5 text-xs text-signin-text-muted">{photoName}</p>
           ) : null}
-        </div>
+        </div> */}
 
         <div>
           <label htmlFor="bio" className={labelClassName}>
@@ -299,7 +288,7 @@ export function LawyerSignupForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-sm bg-primary py-3.5 text-sm font-semibold tracking-wide text-secondary transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-sm bg-primary py-3.5 text-sm font-semibold tracking-wide text-secondary transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 hover:cursor-pointer"
         >
           {isSubmitting ? "Creating account…" : "Complete Registration"}
         </button>

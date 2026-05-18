@@ -45,7 +45,7 @@ export default function SignUpPage() {
         </div>
       </main>
 
-      <footer className="flex flex-col items-center justify-between gap-3 px-6 pb-6 text-[11px] text-signin-text-muted sm:flex-row">
+      {/* <footer className="flex flex-col items-center justify-between gap-3 px-6 pb-6 text-[11px] text-signin-text-muted sm:flex-row">
         <p>© 2024 Lawway Chambers. All rights reserved.</p>
         <div className="flex items-center gap-5">
           <Link href="#" className="transition hover:text-signin-text">
@@ -55,7 +55,7 @@ export default function SignUpPage() {
             Terms of Service
           </Link>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { AuthSelect } from "@/components/auth-select";
 import {
   inputClassName,
   labelClassName,
@@ -144,27 +145,18 @@ export function SignUpForm() {
           <label htmlFor="role" className={labelClassName}>
             Role
           </label>
-          <div className="relative">
-            <UserCircle
-              className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-signin-text-muted"
-              aria-hidden
-            />
-            <select
-              id="role"
-              name="role"
-              value={role}
-              onChange={(event) => setRole(event.target.value as UserRole)}
-              required
-              className={`${inputClassName} appearance-none pr-10 pl-11`}
-            >
-              <option value="client">Client</option>
-              <option value="lawyer">Lawyer</option>
-            </select>
-            <ChevronDown
-              className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-signin-text-muted"
-              aria-hidden
-            />
-          </div>
+          <AuthSelect
+            id="role"
+            name="role"
+            value={role}
+            onChange={(value) => setRole(value as UserRole)}
+            required
+            icon={<UserCircle className="size-4" />}
+            options={[
+              { value: "client", label: "Client" },
+              { value: "lawyer", label: "Lawyer" },
+            ]}
+          />
         </div>
 
         {error ? (

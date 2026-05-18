@@ -19,6 +19,9 @@
   --signin-text: #d1c7b7;
   --signin-text-muted: #8f8378;
   --signin-border: #4a3a35;
+  --scrollbar-track: #1a1210;
+  --scrollbar-thumb: #523d39;
+  --scrollbar-thumb-hover: #d4af37;
 
   /* Semantic aliases */
 
@@ -138,6 +141,29 @@
 
 body {
   font-family: var(--font-body), Arial, Helvetica, sans-serif;
+}
+
+.scrollbar-themed {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.scrollbar-themed::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-themed::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.scrollbar-themed::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border: 2px solid var(--scrollbar-track);
+  border-radius: 9999px;
+}
+
+.scrollbar-themed::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
 }
 
 .dark {
