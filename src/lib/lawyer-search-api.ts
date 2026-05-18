@@ -45,5 +45,9 @@ export async function fetchLawyers(
     );
   }
 
+  if (!("lawyers" in data)) {
+    throw new Error("Search failed. Please try again.");
+  }
+
   return data.lawyers;
 }

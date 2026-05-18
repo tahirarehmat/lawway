@@ -4,6 +4,8 @@ import { ArrowRight } from "lucide-react";
 import { AiAssistantSection } from "@/components/landing/ai-assistant-section";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { PlatformFeaturesSection } from "@/components/landing/platform-features-section";
+import { LawwayLogo } from "@/components/lawway-logo";
+import { LandingSupportWidget } from "@/components/landing/LandingSupportWidget";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import PlansPage from "@/app/plans/page";
 
@@ -86,6 +88,8 @@ export default function Home() {
       </main>
 
       <LandingFooter />
+
+      <LandingSupportWidget />
     </div>
   );
 }
