@@ -8,12 +8,15 @@ import { cn } from "@/lib/utils";
 type NavbarProps = {
   email: string;
   showSupport?: boolean;
+  /** Top-link label for /dashboard/tickets (e.g. “Messages” for advocates) */
+  ticketsLinkLabel?: string;
   scrolled?: boolean;
 };
 
 export function Navbar({
   email,
   showSupport = true,
+  ticketsLinkLabel = "Support",
   scrolled = false,
 }: NavbarProps) {
   return (
@@ -36,7 +39,7 @@ export function Navbar({
                 : "text-neutral/70 hover:text-secondary",
             )}
           >
-            Support
+            {ticketsLinkLabel}
           </Link>
         )}
         <button

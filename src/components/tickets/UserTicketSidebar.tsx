@@ -74,7 +74,7 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
                 <h2 className="text-xl font-semibold tracking-tight text-white">
                   Legal messages
                 </h2>
-                <p className="text-[11px] text-white/40">Your firm&apos;s team</p>
+                <p className="text-[11px] text-white/40">Per advocate — pick a thread below</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -145,7 +145,7 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
                   }`}
                 >
                   <div className="relative max-w-full min-w-0">
-                    <div className="mb-2.5 flex w-full min-w-0 items-start justify-between gap-2">
+                    <div className="mb-2 flex w-full min-w-0 items-start justify-between gap-2">
                       <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-white transition-colors group-hover:text-[#d4af37]">
                         {ticket.subject}
                       </h3>
@@ -155,6 +155,11 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
                         </span>
                       )}
                     </div>
+                    {ticket.lawyerName ? (
+                      <p className="mb-2 truncate text-[11px] font-medium text-[#d4af37]/90">
+                        {ticket.lawyerName}
+                      </p>
+                    ) : null}
                     <div className="flex w-full min-w-0 items-center justify-between gap-2 text-xs">
                       <span className="min-w-0 truncate font-medium text-white/50">
                         {formatTicketDate(ticket.recentActivity)}

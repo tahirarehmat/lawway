@@ -34,9 +34,14 @@ const CLIENT_NAV_ITEMS = [
   { label: "Support", href: "/dashboard/tickets", icon: LifeBuoy },
 ] as const;
 
+const LAWYER_NAV_ITEMS = [
+  { label: "Messages", href: "/dashboard/tickets", icon: LifeBuoy },
+] as const;
+
 export type SidebarNavLabel =
   | (typeof SHARED_NAV_ITEMS)[number]["label"]
-  | (typeof CLIENT_NAV_ITEMS)[number]["label"];
+  | (typeof CLIENT_NAV_ITEMS)[number]["label"]
+  | (typeof LAWYER_NAV_ITEMS)[number]["label"];
 
 type SidebarProps = {
   role?: "client" | "lawyer";
@@ -75,7 +80,11 @@ export function Sidebar({
           ...CLIENT_NAV_ITEMS,
           ...SHARED_NAV_ITEMS.slice(1),
         ]
-      : [...SHARED_NAV_ITEMS];
+      : [
+          SHARED_NAV_ITEMS[0],
+          ...LAWYER_NAV_ITEMS,
+          ...SHARED_NAV_ITEMS.slice(1),
+        ];
   const router = useRouter();
 
   async function handleLogout() {

@@ -12,6 +12,8 @@ type DashboardShellProps = {
   session: SessionPayload;
   activeItem?: SidebarNavLabel;
   showSupport?: boolean;
+  /** Navbar text for /dashboard/tickets link */
+  ticketsLinkLabel?: string;
   children: ReactNode;
 };
 
@@ -19,6 +21,7 @@ export function DashboardShell({
   session,
   activeItem = "Home",
   showSupport = true,
+  ticketsLinkLabel,
   children,
 }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -43,6 +46,7 @@ export function DashboardShell({
         <Navbar
           email={session.email}
           showSupport={showSupport}
+          ticketsLinkLabel={ticketsLinkLabel}
           scrolled={scrolled}
         />
         <div

@@ -130,6 +130,57 @@ export async function searchLawyers({
   }));
 }
 
+export async function getLawyerByUserId(
+  userId: string,
+): Promise<LawyerSearchResult | null> {
+  const pool = getPool();
+  const result = await pool.query<{
+    user_id: string;
+    full_name: string;
+    phone: string;
+    specialization: string;
+    province: string;
+    office_address: string;
+    experience_years: number | null;
+    bio: string | null;
+    profile_photo_url: string | null;
+    bar_registration_no: string;
+  }>(
+    `SELECT
+       lp.user_id,
+       lp.full_name,
+       lp.phone,
+       lp.specialization,
+       lp.province::text AS province,
+       lp.office_address,
+       lp.experience_years,
+       lp.bio,
+       lp.profile_photo_url,
+       lp.bar_registration_no
+     FROM lawyer_profiles lp
+     INNER JOIN users u ON u.user_id = lp.user_id
+     WHERE lp.user_id = $1 AND u.role = 'lawyer' AND u.is_active = true
+     LIMIT 1`,
+    [userId],
+  );
+
+  const row = result.rows[0];
+  if (!row) return null;
+
+  return {
+    userId: row.user_id,
+    fullName: row.full_name,
+    phone: row.phone,
+    specialization: row.specialization,
+    province: row.province,
+    officeAddress: row.office_address,
+    experienceYears: row.experience_years,
+    bio: row.bio,
+    profilePhotoUrl: row.profile_photo_url,
+    barRegistrationNo: row.bar_registration_no,
+  };
+}
+
 export function lawyerInitials(fullName: string): string {
   return fullName
     .split(/\s+/)

@@ -41,6 +41,10 @@ export interface Ticket {
   ticketId: string;
   userId: string;
   userUid: string;
+  /** Advocate this thread is with (client ↔ lawyer routing) */
+  lawyerId?: string;
+  lawyerName?: string;
+  lawyerPhotoUrl?: string | null;
   subject: string;
   description: string;
   category?: string;
@@ -56,6 +60,9 @@ export interface Ticket {
   adminUnreadCount?: number;
   intake?: TicketIntake;
 }
+
+/** Ticket row plus client account id (from path /chats/{clientUserId}/tickets/...) for lawyer inbox */
+export type LawyerInboxTicket = Ticket & { clientUserId: string };
 
 export interface TicketMessage {
   id: string;
@@ -85,6 +92,10 @@ export interface TicketMessage {
 export interface CreateTicketData {
   subject: string;
   description: string;
+  /** Required for client-created threads */
+  lawyerId: string;
+  lawyerName: string;
+  lawyerPhotoUrl?: string | null;
   caseReference?: string;
   intake?: TicketIntake;
 }
@@ -133,10 +144,12 @@ export const createTicket = async (
       ticketId,
       userId,
       userUid,
+      lawyerId: ticketData.lawyerId,
+      lawyerName: ticketData.lawyerName,
       subject: ticketData.subject,
       description: ticketData.description,
       status: "open",
-      assignedTo: null,
+      assignedTo: ticketData.lawyerId,
       createdAt: currentTimestamp,
       updatedAt: currentTimestamp,
       recentActivity: currentTimestamp,
@@ -144,6 +157,10 @@ export const createTicket = async (
       unreadCount: 0,
       adminUnreadCount: 1,
     };
+
+    if (ticketData.lawyerPhotoUrl != null) {
+      ticket.lawyerPhotoUrl = ticketData.lawyerPhotoUrl;
+    }
 
     if (ticketData.caseReference) {
       ticket.caseReference = ticketData.caseReference;
@@ -623,6 +640,71 @@ export const listenToUserBlockStatus = (
   } catch (error) {
     console.error("Error setting up block status listener:", error);
     return () => {};
+  }
+};
+
+/**
+ * Inbox for an advocate: all ticket docs across clients where `lawyerId` matches.
+ * Requires a Firestore composite index: collection group `tickets` — lawyerId + recentActivity.
+ */
+export const listenToTicketsForLawyer = (
+  lawyerId: string,
+  callback: (tickets: LawyerInboxTicket[]) => void,
+): (() => void) => {
+  try {
+    const ticketsGroup = collectionGroup(db, "tickets");
+    const q = query(
+      ticketsGroup,
+      where("lawyerId", "==", lawyerId),
+      orderBy("recentActivity", "desc"),
+    );
+
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        if (snapshot.metadata.hasPendingWrites) {
+          return;
+        }
+
+        const tickets: LawyerInboxTicket[] = snapshot.docs.map((d) => {
+          const clientChatDoc = d.ref.parent.parent;
+          const clientUserId = clientChatDoc?.id ?? "";
+          return {
+            id: d.id,
+            clientUserId,
+            ...d.data(),
+          } as LawyerInboxTicket;
+        });
+        callback(tickets);
+      },
+      (err) => console.error("listenToTicketsForLawyer:", err),
+    );
+  } catch (error) {
+    console.error("Error setting up lawyer tickets listener:", error);
+    return () => {};
+  }
+};
+
+/** Call when the lawyer opens a thread so `adminUnreadCount` (client→lawyer) clears */
+export const markLawyerInboxSeen = async (
+  clientUserId: string,
+  ticketDocumentId: string,
+): Promise<void> => {
+  try {
+    const ticketRef = doc(
+      db,
+      "chats",
+      clientUserId,
+      "tickets",
+      ticketDocumentId,
+    );
+    await updateDoc(ticketRef, {
+      adminUnreadCount: 0,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error marking lawyer inbox seen:", error);
+    throw error;
   }
 };
 

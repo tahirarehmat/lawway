@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Award,
@@ -32,6 +33,7 @@ export function LawyerProfileDetailPanel({
   onClose,
 }: LawyerProfileDetailPanelProps) {
   const badge = lawyerBadge(lawyer.experienceYears);
+  const router = useRouter();
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -146,6 +148,12 @@ export function LawyerProfileDetailPanel({
             type="button"
             variant="outline"
             className="h-11 flex-1 gap-2 border-black/10 text-secondary"
+            onClick={() => {
+              onClose();
+              router.push(
+                `/dashboard/tickets?lawyerId=${encodeURIComponent(lawyer.userId)}`,
+              );
+            }}
           >
             <MessageCircle className="size-4" aria-hidden />
             Chat

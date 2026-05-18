@@ -52,6 +52,7 @@ import {
   uploadVideoToCloudinary,
 } from "@/lib/cloudinaryTicketUploads";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { LawyerSearchResult } from "@/lib/lawyers";
 
 const INITIAL_MESSAGES_LIMIT = 20;
 const CACHE_DURATION = 300000;
@@ -87,9 +88,27 @@ interface IntakeState {
 interface UserTicketDashboardProps {
   userId: string;
   userUid: string;
+  /** Open composer for this advocate (from Find a lawyer → Chat) */
+  initialLawyerId?: string | null;
   isCompact?: boolean;
   isWidget?: boolean;
   onClose?: () => void;
+}
+
+function ticketToLawyerContext(t: Ticket): LawyerSearchResult | null {
+  if (!t.lawyerId || !t.lawyerName) return null;
+  return {
+    userId: t.lawyerId,
+    fullName: t.lawyerName,
+    phone: "",
+    specialization: "",
+    province: "",
+    officeAddress: "",
+    experienceYears: null,
+    bio: null,
+    profilePhotoUrl: t.lawyerPhotoUrl ?? null,
+    barRegistrationNo: "",
+  };
 }
 
 const linkifyHtml = (html: string): string => {
@@ -157,6 +176,7 @@ const MessageBody: React.FC<{ content: string; className?: string }> = ({
 export default function UserTicketDashboard({
   userId,
   userUid,
+  initialLawyerId = null,
   isCompact = false,
   isWidget: _isWidget = true,
   onClose,
@@ -204,6 +224,20 @@ export default function UserTicketDashboard({
   const [intakeStep, setIntakeStep] = useState<IntakeStep>("category");
   const [caseRefInput, setCaseRefInput] = useState("");
 
+  /** Advocate targeted for the next / current draft thread */
+  const [chatWithLawyer, setChatWithLawyer] = useState<LawyerSearchResult | null>(null);
+
+  const autoOpenedLawyerRef = useRef<string | null>(null);
+  useEffect(() => {
+    autoOpenedLawyerRef.current = null;
+  }, [initialLawyerId]);
+
+  useEffect(() => {
+    if (!selectedTicket) return;
+    const ctx = ticketToLawyerContext(selectedTicket);
+    if (ctx) setChatWithLawyer(ctx);
+  }, [selectedTicket?.id]);
+
   const [queueStats, setQueueStats] = useState<QueueStats>({
     openCount: 0,
     inProgressCount: 0,
@@ -217,10 +251,16 @@ export default function UserTicketDashboard({
     return false;
   });
 
-  const hasActiveTicket = tickets.some(
-    (t) => t.status !== "resolved" && t.status !== "closed",
-  );
-  const canCreateTicket = !isUserBlocked && !hasActiveTicket;
+  const ticketIsActive = (t: Ticket) =>
+    t.status !== "resolved" && t.status !== "closed";
+
+  const hasActiveTicketForLawyer = (lawyerId: string | undefined) =>
+    !!lawyerId && tickets.some((t) => t.lawyerId === lawyerId && ticketIsActive(t));
+
+  const canCreateTicket =
+    !isUserBlocked &&
+    !!chatWithLawyer &&
+    !hasActiveTicketForLawyer(chatWithLawyer.userId);
 
   const resetIntake = () => {
     setIntake({});
@@ -230,6 +270,45 @@ export default function UserTicketDashboard({
 
   const needsCaseRefPrompt = (cat: IntakeCategory) =>
     ["case_update", "billing_fees", "documents_evidence", "hearing_scheduling"].includes(cat);
+
+  useEffect(() => {
+    if (!initialLawyerId?.trim()) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/lawyers/${encodeURIComponent(initialLawyerId.trim())}`,
+        );
+        if (!res.ok) throw new Error("not found");
+        const data = await res.json();
+        if (!cancelled && data.lawyer) setChatWithLawyer(data.lawyer as LawyerSearchResult);
+      } catch {
+        if (!cancelled) {
+          setChatWithLawyer(null);
+          toast.error("Could not load advocate profile.");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialLawyerId]);
+
+  useEffect(() => {
+    if (!ticketsLoaded || !chatWithLawyer) return;
+    const lid = chatWithLawyer.userId;
+    const match = tickets.find((t) => t.lawyerId === lid && ticketIsActive(t));
+    if (match) {
+      setSelectedTicket(match);
+      setShowNewConversation(false);
+      return;
+    }
+    if (initialLawyerId?.trim() === lid && autoOpenedLawyerRef.current !== lid) {
+      autoOpenedLawyerRef.current = lid;
+      setSelectedTicket(null);
+      setShowNewConversation(true);
+    }
+  }, [ticketsLoaded, chatWithLawyer?.userId, tickets, initialLawyerId]);
 
   useEffect(() => {
     const u = listenToGlobalQueueStats(setQueueStats);
@@ -462,6 +541,7 @@ export default function UserTicketDashboard({
         setSelectedTicket(nt);
         const p = new URLSearchParams(searchParams.toString());
         p.set("id", nt.ticketId);
+        if (nt.lawyerId) p.set("lawyerId", nt.lawyerId);
         router.replace(`${pathname}?${p.toString()}`, { scroll: false });
         setPendingTicketId(null);
       }
@@ -530,6 +610,14 @@ export default function UserTicketDashboard({
   const handleCreateTicketAndSendMessage = async () => {
     const messageText = newMessage.trim();
     if (!messageText) return;
+    if (!chatWithLawyer) {
+      toast.error("Choose an advocate from Find a lawyer first, then open Chat.");
+      return;
+    }
+    if (!canCreateTicket) {
+      toast.error("You already have an open conversation with this advocate.");
+      return;
+    }
     if (intakeStep !== "done" || !intake.category) {
       toast.error("Please complete the steps above.");
       return;
@@ -553,6 +641,9 @@ export default function UserTicketDashboard({
         description: messageText,
         caseReference: intake.caseReference?.trim(),
         intake: intakePayload,
+        lawyerId: chatWithLawyer.userId,
+        lawyerName: chatWithLawyer.fullName,
+        lawyerPhotoUrl: chatWithLawyer.profilePhotoUrl ?? null,
       });
       setPendingTicketId(ticketId);
       setShowNewConversation(false);
@@ -813,6 +904,18 @@ export default function UserTicketDashboard({
   };
 
   const startNewConversation = () => {
+    if (isUserBlocked) {
+      toast.error("Your account cannot start new conversations.");
+      return;
+    }
+    if (!chatWithLawyer) {
+      toast.error("Open Find a lawyer, choose an advocate, then tap Chat—or pick a thread below.");
+      return;
+    }
+    if (!canCreateTicket) {
+      toast.error("You already have an open conversation with this advocate.");
+      return;
+    }
     setSelectedTicket(null);
     setShowNewConversation(true);
     resetIntake();
@@ -821,9 +924,13 @@ export default function UserTicketDashboard({
   const handleTicketSelect = (t: Ticket) => {
     setSelectedTicket(t);
     setShowNewConversation(false);
+    const ctx = ticketToLawyerContext(t);
+    if (ctx) setChatWithLawyer(ctx);
     if (isCompact) setShowChatView(true);
     const p = new URLSearchParams(searchParams.toString());
     p.set("id", t.ticketId);
+    if (t.lawyerId) p.set("lawyerId", t.lawyerId);
+    else p.delete("lawyerId");
     router.replace(`${pathname}?${p.toString()}`, { scroll: false });
     setSidebarOpen(false);
   };
@@ -1149,6 +1256,18 @@ export default function UserTicketDashboard({
               </div>
             </div>
             <div className="scrollbar-themed min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+              {chatWithLawyer ? (
+                <div className="rounded-2xl border border-[#d4af37]/35 bg-[#2a1815]/70 px-4 py-3 text-sm text-white/90">
+                  New thread with{" "}
+                  <span className="font-semibold text-[#d4af37]">{chatWithLawyer.fullName}</span>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-white/10 bg-[#2a1815]/40 px-4 py-3 text-sm text-white/70">
+                  Choose an advocate under{" "}
+                  <span className="font-medium text-[#d4af37]">Find a lawyer</span>, then tap{" "}
+                  <span className="font-medium text-white">Chat</span> to message them here.
+                </div>
+              )}
               <div className="rounded-2xl border border-[#d4af37]/25 bg-[#2a1815]/60 p-3 text-sm text-white/85">
                 What can we help you with?
               </div>
@@ -1244,7 +1363,9 @@ export default function UserTicketDashboard({
               </form>
             ) : (
               <p className="shrink-0 p-4 text-center text-sm text-white/50">
-                You cannot start a new thread while another is open.
+                {chatWithLawyer
+                  ? `You already have an open conversation with ${chatWithLawyer.fullName}. Open it from the list, or wait until it is closed.`
+                  : "Choose an advocate from Find a lawyer to start a new thread, or open an existing conversation from the list."}
               </p>
             )}
           </div>
