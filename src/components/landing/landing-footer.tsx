@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 const PLATFORM_LINKS = [
   { label: "Home", href: "/#home" },
   { label: "Features", href: "/#features" },
-  { label: "Pricing", href: "/#pricing" },
+  { label: "Pricing", href: "/plans" },
   { label: "Legal AI", href: "/#legal-ai" },
 ] as const;
 
