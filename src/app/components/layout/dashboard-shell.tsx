@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { SessionPayload } from "@/lib/session";
 import { Navbar } from "@/app/components/layout/navbar";
 import {
@@ -25,14 +25,6 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const handleScroll = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setScrolled(el.scrollTop > 0);
-  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden bg-tertiary">
@@ -47,13 +39,8 @@ export function DashboardShell({
           email={session.email}
           showSupport={showSupport}
           ticketsLinkLabel={ticketsLinkLabel}
-          scrolled={scrolled}
         />
-        <div
-          ref={scrollRef}
-          onScroll={handleScroll}
-          className="dashboard-grid-bg min-h-0 flex-1 overflow-y-auto"
-        >
+        <div className="dashboard-grid-bg min-h-0 flex-1 overflow-y-auto">
           {children}
         </div>
       </div>

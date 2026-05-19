@@ -132,7 +132,7 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto">
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">

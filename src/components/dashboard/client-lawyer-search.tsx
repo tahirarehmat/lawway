@@ -124,7 +124,7 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
   const rangeEnd = Math.min(page * LAWYER_SEARCH_PAGE_SIZE, total);
 
   return (
-    <section className="mx-auto w-full max-w-5xl">
+    <section className="mx-auto w-full">
       {showHeading ? (
         <>
           <h1 className="font-serif text-3xl font-medium tracking-tight text-secondary sm:text-4xl">

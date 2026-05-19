@@ -43,7 +43,7 @@ export function ClientEvents() {
   }, [filter, loadEvents]);
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto ">
       <header className="mb-8">
         <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
           Calendar & updates

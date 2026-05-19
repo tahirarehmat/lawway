@@ -80,15 +80,15 @@ export function ClientDashboard({
 
   return (
     <DashboardShell session={session} activeItem="Home">
-      <div className="dashboard-home mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-10">
-        <header className="mb-6">
+      <div className="dashboard-home mx-auto px-4 py-8 sm:px-8 sm:py-10"> {/* dashboard-home is a class name for the dashboard home page  max-w-6xl */}
+        {/* <header className="mb-6">
           <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
             Client dashboard
           </p>
           <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-secondary sm:text-4xl">
             Home
           </h1>
-        </header>
+        </header> */}
 
         <section className="home-outer mb-6" aria-label="Overview">
           <div className="home-outer-body">
