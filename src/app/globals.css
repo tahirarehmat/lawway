@@ -23,6 +23,34 @@
   --scrollbar-thumb: #523d39;
   --scrollbar-thumb-hover: #d4af37;
 
+  /* Dashboard pattern — soft cream grid */
+  --dashboard-pattern-base: #fcf9f6;
+  --dashboard-pattern-line: color-mix(
+    in srgb,
+    var(--secondary) 7%,
+    color-mix(in srgb, var(--primary) 4%, transparent)
+  );
+
+  /* Dashboard surfaces */
+  --dashboard-surface: #fffcf8;
+  --dashboard-surface-muted: #f6f1ea;
+  --dashboard-border: color-mix(in srgb, var(--secondary) 9%, transparent);
+  --dashboard-border-hover: color-mix(in srgb, var(--primary) 38%, transparent);
+  --dashboard-shadow: 0 1px 2px color-mix(in srgb, var(--secondary) 5%, transparent);
+  --dashboard-shadow-hover: 0 6px 20px color-mix(in srgb, var(--secondary) 7%, transparent);
+
+  /* Home — balanced brown/gold */
+  --home-card-surface: #fffefb;
+  --home-card-soft: color-mix(in srgb, var(--secondary) 4%, white);
+  --home-card-accent: color-mix(in srgb, var(--primary) 13%, var(--dashboard-pattern-base));
+  --home-text: var(--secondary);
+  --home-text-muted: color-mix(in srgb, var(--secondary) 52%, transparent);
+  --home-text-subtle: color-mix(in srgb, var(--secondary) 40%, transparent);
+  --home-border-soft: color-mix(in srgb, var(--secondary) 11%, transparent);
+  --home-border-gold: color-mix(in srgb, var(--primary) 28%, transparent);
+  --home-shadow-soft: 0 2px 14px color-mix(in srgb, var(--secondary) 6%, transparent);
+  --home-shadow-hover: 0 8px 24px color-mix(in srgb, var(--secondary) 9%, transparent);
+
   /* Semantic aliases */
 
   --background: oklch(1 0 0);
@@ -164,6 +192,239 @@ body {
 
 .scrollbar-themed::-webkit-scrollbar-thumb:hover {
   background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Scrollable areas without visible scrollbars (still scrollable) */
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dashboard main area: light cream with a very soft grid */
+.dashboard-grid-bg {
+  background-color: var(--dashboard-pattern-base);
+  background-image:
+    linear-gradient(
+      to right,
+      var(--dashboard-pattern-line) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      var(--dashboard-pattern-line) 1px,
+      transparent 1px
+    );
+  background-size: 56px 56px;
+}
+
+.dashboard-card {
+  border-radius: 1rem;
+  border: 1px solid var(--dashboard-border);
+  background: var(--dashboard-surface);
+  box-shadow: var(--dashboard-shadow);
+}
+
+.dashboard-card-muted {
+  border-radius: 1rem;
+  border: 1px solid var(--dashboard-border);
+  background: var(--dashboard-surface-muted);
+  box-shadow: var(--dashboard-shadow);
+}
+
+.dashboard-card-interactive {
+  border-radius: 1rem;
+  border: 1px solid var(--dashboard-border);
+  background: var(--dashboard-surface);
+  box-shadow: var(--dashboard-shadow);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dashboard-card-interactive:hover {
+  border-color: var(--dashboard-border-hover);
+  box-shadow: var(--dashboard-shadow-hover);
+  background: color-mix(in srgb, var(--dashboard-surface) 88%, var(--primary) 12%);
+}
+
+.dashboard-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.125rem 0.625rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  background: color-mix(in srgb, var(--primary) 16%, var(--dashboard-pattern-base));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.dashboard-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--primary) 14%, var(--dashboard-pattern-base));
+  color: color-mix(in srgb, var(--secondary) 88%, var(--primary));
+}
+
+/* Client home — dark outer shells (sidebar), inset light inner cards */
+.dashboard-home {
+  --home-radius: 1.25rem;
+  --home-inset: 1.25rem;
+  --home-inset-lg: 1.5rem;
+  --home-outer-bg: var(--secondary);
+  --home-outer-border: color-mix(in srgb, var(--primary) 22%, transparent);
+  --home-cream: #fcf9f6;
+}
+
+.dashboard-home .home-outer {
+  border-radius: var(--home-radius);
+  border: 1px solid var(--home-outer-border);
+  background: var(--home-outer-bg);
+  box-shadow: 0 10px 36px color-mix(in srgb, var(--secondary) 45%, transparent);
+}
+
+.dashboard-home .home-outer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem var(--home-inset-lg);
+  border-bottom: 1px solid color-mix(in srgb, white 10%, transparent);
+}
+
+.dashboard-home .home-outer-title {
+  font-family: var(--font-headline), serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.dashboard-home .home-outer-link {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--home-cream) 72%, transparent);
+  transition: color 0.2s ease;
+}
+
+.dashboard-home .home-outer-link:hover {
+  color: var(--primary);
+}
+
+.dashboard-home .home-outer-body {
+  padding: var(--home-inset-lg);
+}
+
+.dashboard-home .home-outer-body-tight {
+  padding: var(--home-inset);
+}
+
+.dashboard-home .home-inner {
+  border-radius: calc(var(--home-radius) - 0.2rem);
+  border: 1px solid var(--home-border-soft);
+  background: var(--home-card-surface);
+  box-shadow: 0 2px 10px color-mix(in srgb, black 6%, transparent);
+}
+
+.dashboard-home .home-inner-featured {
+  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--primary) 18%, white) 0%,
+      var(--home-card-accent) 45%,
+      var(--home-card-surface) 100%
+    );
+}
+
+.dashboard-home .home-inner-interactive {
+  border-radius: calc(var(--home-radius) - 0.2rem);
+  border: 1px solid var(--home-border-soft);
+  background: var(--home-card-surface);
+  box-shadow: 0 2px 10px color-mix(in srgb, black 6%, transparent);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dashboard-home .home-inner-interactive:hover {
+  border-color: var(--home-border-gold);
+  box-shadow: var(--home-shadow-hover);
+  background: var(--home-card-soft);
+}
+
+.dashboard-home .home-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.875rem;
+  background: color-mix(in srgb, var(--primary) 22%, white);
+  color: var(--home-text);
+}
+
+.dashboard-home .home-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--primary);
+  color: var(--secondary);
+}
+
+.dashboard-home .home-muted {
+  color: var(--home-text-muted);
+}
+
+.dashboard-home .home-subtle {
+  color: var(--home-text-subtle);
+}
+
+.dashboard-home .home-accent {
+  color: color-mix(in srgb, var(--secondary) 30%, var(--primary));
+  font-weight: 600;
+}
+
+.dashboard-home .home-stat-value {
+  font-family: var(--font-headline), serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--home-text);
+}
+
+.dashboard-home .home-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid var(--home-border-soft);
+  background: color-mix(in srgb, var(--primary) 8%, white);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--home-text-muted);
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.dashboard-home .home-chip:hover {
+  border-color: var(--home-border-gold);
+  color: var(--home-text);
 }
 
 .dark {

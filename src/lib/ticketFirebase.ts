@@ -192,6 +192,36 @@ export const createTicket = async (
   }
 };
 
+/** Opens or creates a client ↔ lawyer thread tied to an accepted case. */
+export async function ensureCaseChatTicket(params: {
+  clientId: string;
+  clientUid: string;
+  lawyerId: string;
+  lawyerName: string;
+  caseId: string;
+  caseTitle: string;
+}): Promise<string> {
+  const ticketsRef = collection(db, "chats", params.clientId, "tickets");
+  const snap = await getDocs(
+    query(ticketsRef, where("lawyerId", "==", params.lawyerId)),
+  );
+
+  for (const docSnap of snap.docs) {
+    const data = docSnap.data() as Ticket;
+    if (data.status !== "closed" && data.status !== "resolved") {
+      return data.ticketId;
+    }
+  }
+
+  return createTicket(params.clientId, params.clientUid, {
+    subject: `Case: ${params.caseTitle}`,
+    description: `Secure messaging for case “${params.caseTitle}”.`,
+    lawyerId: params.lawyerId,
+    lawyerName: params.lawyerName,
+    caseReference: params.caseId,
+  });
+};
+
 export const getUserTickets = async (userId: string): Promise<Ticket[]> => {
   try {
     const ticketsRef = collection(db, "chats", userId, "tickets");

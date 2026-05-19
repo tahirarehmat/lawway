@@ -6,6 +6,7 @@ import {
   isValidSpecialization,
   parseExperienceFilter,
 } from "@/lib/lawyer-search-filters";
+import { LAWYER_SEARCH_PAGE_SIZE } from "@/lib/lawyer-search-api";
 import { searchLawyers } from "@/lib/lawyers";
 
 export async function GET(request: Request) {
@@ -22,12 +23,20 @@ export async function GET(request: Request) {
     const province = searchParams.get("province") ?? undefined;
     const specialization = searchParams.get("specialization") ?? undefined;
     const experience = searchParams.get("experience") ?? undefined;
+    const pageRaw = searchParams.get("page");
+    const pageSizeRaw = searchParams.get("pageSize");
 
     const q = query?.trim() ?? "";
     const loc = location?.trim() ?? "";
     const provinceValue = province?.trim() ?? "";
     const specializationValue = specialization?.trim() ?? "";
     const experienceValue = experience?.trim() ?? "";
+
+    const page = Math.max(1, Number.parseInt(pageRaw ?? "1", 10) || 1);
+    const pageSize = Math.min(
+      50,
+      Math.max(1, Number.parseInt(pageSizeRaw ?? String(LAWYER_SEARCH_PAGE_SIZE), 10) || LAWYER_SEARCH_PAGE_SIZE),
+    );
 
     if (provinceValue && !isValidProvince(provinceValue)) {
       return NextResponse.json({ error: "Invalid province filter." }, { status: 400 });
@@ -49,25 +58,18 @@ export async function GET(request: Request) {
 
     const { minYears, maxYears } = parseExperienceFilter(experienceValue);
 
-    const hasFilters = Boolean(
-      q ||
-        loc ||
-        provinceValue ||
-        specializationValue ||
-        experienceValue,
-    );
-
-    const lawyers = await searchLawyers({
+    const result = await searchLawyers({
       query: q || undefined,
       location: loc || undefined,
       province: provinceValue || undefined,
       specialization: specializationValue || undefined,
       experienceMin: minYears,
       experienceMax: maxYears,
-      limit: hasFilters ? 48 : 6,
+      page,
+      pageSize,
     });
 
-    return NextResponse.json({ lawyers });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Lawyer search failed:", error);
     return NextResponse.json(

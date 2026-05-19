@@ -139,6 +139,23 @@ export default function LawyerTicketDashboard({
 
   useEffect(() => {
     if (!tickets.length || !ticketsLoaded) return;
+
+    const clientId = searchParams.get("clientId")?.trim();
+    if (clientId) {
+      const forClient = tickets.filter((x) => x.clientUserId === clientId);
+      const t =
+        forClient.find((x) => x.status !== "closed") ?? forClient[0] ?? null;
+      if (
+        t &&
+        (t.ticketId !== selectedTicket?.ticketId ||
+          t.clientUserId !== selectedTicket?.clientUserId)
+      ) {
+        setSelectedTicket(t);
+        if (isCompact) setShowChatView(true);
+      }
+      return;
+    }
+
     const id = searchParams.get("id");
     if (!id) return;
     const t = tickets.find((x) => x.ticketId === id);
@@ -150,7 +167,14 @@ export default function LawyerTicketDashboard({
       setSelectedTicket(t);
       if (isCompact) setShowChatView(true);
     }
-  }, [tickets, ticketsLoaded, searchParams, isCompact, selectedTicket?.ticketId]);
+  }, [
+    tickets,
+    ticketsLoaded,
+    searchParams,
+    isCompact,
+    selectedTicket?.ticketId,
+    selectedTicket?.clientUserId,
+  ]);
 
   useEffect(() => {
     if (!selectedTicket || !lawyerUserId) return;

@@ -7,6 +7,7 @@ import {
   Briefcase,
   Calendar,
   FileText,
+  Inbox,
   LayoutGrid,
   LifeBuoy,
   LogOut,
@@ -15,15 +16,16 @@ import {
   Scale,
   Search,
   Settings,
+  CalendarDays,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/lib/logout";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const SHARED_NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: LayoutGrid },
-  { label: "My Cases", href: "#", icon: Briefcase },
+  { label: "Requests", href: "/dashboard/requests", icon: Inbox },
+  { label: "My Cases", href: "/dashboard/cases", icon: Briefcase },
   { label: "Hearing Calendar", href: "#", icon: Calendar },
   { label: "Legal AI", href: "#", icon: Bot },
   { label: "Documents", href: "#", icon: FileText },
@@ -31,6 +33,7 @@ const SHARED_NAV_ITEMS = [
 
 const CLIENT_NAV_ITEMS = [
   { label: "Search", href: "/dashboard/search", icon: Search },
+  { label: "Events", href: "/dashboard/events", icon: CalendarDays },
   { label: "Support", href: "/dashboard/tickets", icon: LifeBuoy },
 ] as const;
 
@@ -160,22 +163,31 @@ export function Sidebar({
           collapsed ? "items-center px-2" : "px-4",
         )}
       >
-        <Button
-          className={cn(
-            "rounded-lg bg-primary text-secondary hover:bg-primary/90",
-            collapsed
-              ? "size-11 shrink-0 p-0"
-              : "h-11 w-full text-sm font-semibold",
-          )}
-          aria-label="New Case File"
-          title="New Case File"
-        >
-          {collapsed ? (
-            <Plus className="size-5" />
-          ) : (
-            "+ New Case File"
-          )}
-        </Button>
+        {role === "client" ? (
+          <Link
+            href="/dashboard/requests/new"
+            className={cn(
+              "flex items-center justify-center rounded-lg bg-primary font-semibold text-secondary transition hover:bg-primary/90",
+              collapsed ? "size-11 shrink-0" : "h-11 w-full text-sm",
+            )}
+            aria-label="New Case File"
+            title="New Case File"
+          >
+            {collapsed ? <Plus className="size-5" /> : "+ New Case File"}
+          </Link>
+        ) : (
+          <Link
+            href="/dashboard/cases"
+            className={cn(
+              "flex items-center justify-center rounded-lg bg-primary font-semibold text-secondary transition hover:bg-primary/90",
+              collapsed ? "size-11 shrink-0" : "h-11 w-full text-sm",
+            )}
+            aria-label="View cases"
+            title="View cases"
+          >
+            {collapsed ? <Briefcase className="size-5" /> : "My case files"}
+          </Link>
+        )}
 
         <nav className={cn("space-y-1", collapsed ? "mt-4 w-full" : "mt-6 w-full")}>
           {navItems.map((item) => {

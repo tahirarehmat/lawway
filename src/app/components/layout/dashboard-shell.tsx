@@ -52,7 +52,7 @@ export function DashboardShell({
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="min-h-0 flex-1 overflow-y-auto"
+          className="dashboard-grid-bg min-h-0 flex-1 overflow-y-auto"
         >
           {children}
         </div>

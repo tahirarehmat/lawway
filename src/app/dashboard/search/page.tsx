@@ -16,7 +16,7 @@ export default async function ClientSearchPage() {
 
   return (
     <DashboardShell session={session} activeItem="Search" showSupport>
-      <main className="px-4 py-8 sm:px-8">
+      <main className="px-4 py-8 sm:px-10 lg:px-14">
         <ClientLawyerSearch />
       </main>
     </DashboardShell>

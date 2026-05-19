@@ -6,6 +6,7 @@ import {
   PROVINCES,
   SPECIALIZATIONS,
 } from "@/lib/lawyer-search-filters";
+import { LawyerSearchSelect } from "@/components/dashboard/lawyer-search-select";
 import { cn } from "@/lib/utils";
 
 export type LawyerSearchFilterValues = {
@@ -21,47 +22,37 @@ type LawyerSearchFiltersBarProps = {
   className?: string;
 };
 
-const selectClassName =
-  "w-full appearance-none rounded-lg border border-black/10 bg-[#faf9f7] py-2.5 pr-9 pl-9 text-sm text-secondary outline-none transition focus:border-primary/50 focus:ring-1 focus:ring-primary/30";
-
-function FilterSelect({
+function FilterField({
   id,
   label,
-  icon: Icon,
+  icon,
   value,
   onChange,
   options,
 }: {
   id: string;
   label: string;
-  icon: typeof MapPin;
+  icon: React.ReactNode;
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
 }) {
   return (
     <div className="min-w-0 flex-1">
-      <label htmlFor={id} className="mb-1.5 block text-[11px] font-medium tracking-wide text-neutral/50 uppercase">
+      <label
+        htmlFor={id}
+        className="mb-1.5 block text-[11px] font-medium tracking-wide text-neutral/50 uppercase"
+      >
         {label}
       </label>
-      <div className="relative">
-        <Icon
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neutral/40"
-          aria-hidden
-        />
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={selectClassName}
-        >
-          {options.map((option) => (
-            <option key={option.value || "any"} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <LawyerSearchSelect
+        id={id}
+        value={value}
+        onChange={onChange}
+        options={options}
+        icon={icon}
+        aria-label={label}
+      />
     </div>
   );
 }
@@ -79,7 +70,7 @@ export function LawyerSearchFiltersBar({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-black/5 bg-white p-4 shadow-sm",
+        "rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-5",
         className,
       )}
     >
@@ -99,11 +90,11 @@ export function LawyerSearchFiltersBar({
         ) : null}
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
-        <FilterSelect
+      <div className="flex flex-col gap-4 sm:flex-row sm:gap-4">
+        <FilterField
           id="filter-province"
           label="Location"
-          icon={MapPin}
+          icon={<MapPin className="size-4" aria-hidden />}
           value={values.province}
           onChange={(province) => onChange({ ...values, province })}
           options={[
@@ -111,10 +102,10 @@ export function LawyerSearchFiltersBar({
             ...PROVINCES.map((item) => ({ value: item, label: item })),
           ]}
         />
-        <FilterSelect
+        <FilterField
           id="filter-experience"
           label="Experience"
-          icon={Clock}
+          icon={<Clock className="size-4" aria-hidden />}
           value={values.experience}
           onChange={(experience) => onChange({ ...values, experience })}
           options={EXPERIENCE_FILTER_OPTIONS.map((item) => ({
@@ -122,10 +113,10 @@ export function LawyerSearchFiltersBar({
             label: item.label,
           }))}
         />
-        <FilterSelect
+        <FilterField
           id="filter-specialization"
           label="Type of lawyer"
-          icon={Briefcase}
+          icon={<Briefcase className="size-4" aria-hidden />}
           value={values.specialization}
           onChange={(specialization) => onChange({ ...values, specialization })}
           options={[

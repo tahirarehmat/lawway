@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronRight, MapPin, Scale } from "lucide-react";
+import { ChevronRight, MapPin, Scale, User } from "lucide-react";
 import type { LawyerSearchResult } from "@/lib/lawyers";
-import { lawyerBadge, lawyerInitials } from "@/lib/lawyers";
+import { lawyerBadge } from "@/lib/lawyers";
 import { cn } from "@/lib/utils";
 
 type LawyerSearchResultCardProps = {
@@ -42,8 +42,8 @@ export function LawyerSearchResultCard({
           />
         </div>
       ) : (
-        <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-secondary font-serif text-lg font-medium text-primary sm:size-16 sm:text-xl">
-          {lawyerInitials(lawyer.fullName)}
+        <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-black/5 bg-tertiary text-secondary/70 sm:size-16">
+          <User className="size-7 sm:size-8" strokeWidth={1.5} aria-hidden />
         </div>
       )}
 

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Award,
   Briefcase,
@@ -158,12 +159,17 @@ export function LawyerProfileDetailPanel({
             <MessageCircle className="size-4" aria-hidden />
             Chat
           </Button>
-          <Button
-            type="button"
-            className="h-11 flex-1 bg-secondary text-white hover:bg-secondary/90"
+          <Link
+            href={`/dashboard/requests/new?${new URLSearchParams({
+              title: "Consultation request",
+              lawyerId: lawyer.userId,
+              lawyerName: lawyer.fullName,
+            }).toString()}`}
+            onClick={onClose}
+            className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-secondary text-sm font-medium text-white transition hover:bg-secondary/90"
           >
             Book consultation
-          </Button>
+          </Link>
         </div>
       </aside>
     </div>

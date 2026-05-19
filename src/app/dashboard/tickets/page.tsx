@@ -24,9 +24,11 @@ export default async function TicketsPage({ searchParams }: PageProps) {
   }
 
   const sp = searchParams ? await searchParams : {};
-  const raw = sp.lawyerId;
-  const initialLawyerId =
-    typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] ?? null : null;
+  const pick = (key: string) => {
+    const raw = sp[key];
+    return typeof raw === "string" ? raw : Array.isArray(raw) ? raw[0] ?? null : null;
+  };
+  const initialLawyerId = pick("lawyerId");
 
   if (session.role === "lawyer") {
     return (

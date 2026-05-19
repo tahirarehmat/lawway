@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 import { AiAssistantSection } from "@/components/landing/ai-assistant-section";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { PlatformFeaturesSection } from "@/components/landing/platform-features-section";
-import { LawwayLogo } from "@/components/lawway-logo";
 import { LandingSupportWidget } from "@/components/landing/LandingSupportWidget";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import PlansPage from "@/app/plans/page";
@@ -61,7 +60,6 @@ export default function Home() {
                   width={720}
                   height={720}
                   className="w-full object-cover"
-                  
                   priority
                 />
                 <div className="absolute bottom-6 left-6 max-w-[min(calc(100%-3rem),280px)] rounded-lg border border-black/[0.06] bg-white p-5 shadow-lg">
@@ -82,13 +80,12 @@ export default function Home() {
 
         <PlatformFeaturesSection />
 
-        <PlansPage />
-
         <AiAssistantSection />
+
+        <PlansPage />
       </main>
 
       <LandingFooter />
-
       <LandingSupportWidget />
     </div>
   );

@@ -9,7 +9,12 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const schemaPath = join(__dirname, "..", "schema", "001_core_cases.sql");
+import { readdirSync } from "node:fs";
+
+const schemaDir = join(__dirname, "..", "schema");
+const schemaFiles = readdirSync(schemaDir)
+  .filter((f) => f.endsWith(".sql"))
+  .sort();
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -20,11 +25,13 @@ if (!connectionString) {
 neonConfig.webSocketConstructor = ws;
 
 const pool = new Pool({ connectionString });
-const sql = readFileSync(schemaPath, "utf8");
 
 try {
-  await pool.query(sql);
-  console.log("Migration applied: schema/001_core_cases.sql");
+  for (const file of schemaFiles) {
+    const sql = readFileSync(join(schemaDir, file), "utf8");
+    await pool.query(sql);
+    console.log(`Migration applied: schema/${file}`);
+  }
 } catch (error) {
   console.error("Migration failed:", error);
   process.exit(1);

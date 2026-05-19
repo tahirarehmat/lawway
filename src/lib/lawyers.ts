@@ -13,6 +13,13 @@ export type LawyerSearchResult = {
   barRegistrationNo: string;
 };
 
+export type LawyerSearchPage = {
+  lawyers: LawyerSearchResult[];
+  total: number;
+  page: number;
+  pageSize: number;
+};
+
 type SearchLawyersParams = {
   query?: string;
   location?: string;
@@ -20,7 +27,8 @@ type SearchLawyersParams = {
   specialization?: string;
   experienceMin?: number;
   experienceMax?: number;
-  limit?: number;
+  page?: number;
+  pageSize?: number;
 };
 
 export async function searchLawyers({
@@ -30,8 +38,9 @@ export async function searchLawyers({
   specialization,
   experienceMin,
   experienceMax,
-  limit = 24,
-}: SearchLawyersParams): Promise<LawyerSearchResult[]> {
+  page = 1,
+  pageSize = 10,
+}: SearchLawyersParams): Promise<LawyerSearchPage> {
   const pool = getPool();
   const q = query?.trim() ?? "";
   const loc = location?.trim() ?? "";
@@ -83,7 +92,15 @@ export async function searchLawyers({
     paramIndex++;
   }
 
-  params.push(String(limit));
+  const safePage = Math.max(1, page);
+  const safePageSize = Math.min(50, Math.max(1, pageSize));
+  const offset = (safePage - 1) * safePageSize;
+
+  params.push(String(safePageSize));
+  const limitParam = paramIndex;
+  paramIndex++;
+  params.push(String(offset));
+  const offsetParam = paramIndex;
 
   const result = await pool.query<{
     user_id: string;
@@ -96,6 +113,7 @@ export async function searchLawyers({
     bio: string | null;
     profile_photo_url: string | null;
     bar_registration_no: string;
+    total_count: string;
   }>(
     `SELECT
        lp.user_id,
@@ -107,27 +125,35 @@ export async function searchLawyers({
        lp.experience_years,
        lp.bio,
        lp.profile_photo_url,
-       lp.bar_registration_no
+       lp.bar_registration_no,
+       COUNT(*) OVER()::text AS total_count
      FROM lawyer_profiles lp
      INNER JOIN users u ON u.user_id = lp.user_id
      WHERE ${conditions.join(" AND ")}
      ORDER BY lp.experience_years DESC NULLS LAST, lp.full_name ASC
-     LIMIT $${paramIndex}`,
+     LIMIT $${limitParam} OFFSET $${offsetParam}`,
     params,
   );
 
-  return result.rows.map((row) => ({
-    userId: row.user_id,
-    fullName: row.full_name,
-    phone: row.phone,
-    specialization: row.specialization,
-    province: row.province,
-    officeAddress: row.office_address,
-    experienceYears: row.experience_years,
-    bio: row.bio,
-    profilePhotoUrl: row.profile_photo_url,
-    barRegistrationNo: row.bar_registration_no,
-  }));
+  const total = result.rows.length > 0 ? Number(result.rows[0].total_count) : 0;
+
+  return {
+    lawyers: result.rows.map((row) => ({
+      userId: row.user_id,
+      fullName: row.full_name,
+      phone: row.phone,
+      specialization: row.specialization,
+      province: row.province,
+      officeAddress: row.office_address,
+      experienceYears: row.experience_years,
+      bio: row.bio,
+      profilePhotoUrl: row.profile_photo_url,
+      barRegistrationNo: row.bar_registration_no,
+    })),
+    total,
+    page: safePage,
+    pageSize: safePageSize,
+  };
 }
 
 export async function getLawyerByUserId(
