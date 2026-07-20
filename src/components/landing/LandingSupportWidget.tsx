@@ -17,18 +17,26 @@ function ChatBubble({ role, text }: { role: "user" | "ai"; text: string }) {
   const isUser = role === "user";
   return (
     <div
-      className={
-        isUser
-          ? "ml-auto max-w-[88%] rounded-2xl rounded-br-md bg-secondary px-4 py-2.5 text-sm leading-relaxed text-[#FCF9F6]"
-          : "max-w-[92%] rounded-2xl rounded-bl-md border border-[#ebe7e2] bg-white px-4 py-2.5 text-sm leading-relaxed text-[#2c2c2c]"
-      }
+      className={`flex w-full min-w-0 ${isUser ? "justify-end" : "justify-start"}`}
     >
-      {!isUser && (
-        <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
-          Lawway Assistant
-        </p>
-      )}
-      {text}
+      <div
+        className={
+          isUser
+            ? "box-border min-w-0 max-w-[92%] max-h-[min(280px,45dvh)] overflow-x-hidden overflow-y-auto rounded-2xl rounded-br-md bg-secondary text-sm leading-relaxed text-[#FCF9F6]"
+            : "box-border min-w-0 max-w-[92%] max-h-[min(280px,45dvh)] overflow-x-hidden overflow-y-auto rounded-2xl rounded-bl-md border border-[#ebe7e2] bg-white text-sm leading-relaxed text-[#2c2c2c]"
+        }
+      >
+        <div className="box-border min-w-0 max-w-full px-4 pt-2.5 pb-4">
+          {!isUser && (
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
+              Lawway Assistant
+            </p>
+          )}
+          <p className="m-0 max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] [word-break:break-word]">
+            {text}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -123,8 +131,8 @@ export function LandingSupportWidget() {
             </button>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto bg-[#FCF9F6] p-4">
-            <div className="space-y-3">
+          <div className="min-h-0 w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain bg-[#FCF9F6] p-4">
+            <div className="flex w-full min-w-0 flex-col gap-3 overflow-x-hidden">
               {messages.length === 0 && <ChatBubble role="ai" text={WELCOME} />}
               {messages.map((m) => (
                 <ChatBubble

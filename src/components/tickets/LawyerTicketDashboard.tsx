@@ -12,6 +12,7 @@ import {
   listenToTicketsForLawyer,
   markLawyerInboxSeen,
   type LawyerInboxTicket,
+  type TicketMessage,
 } from "@/lib/ticketFirebase";
 import { toast } from "sonner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -95,7 +96,7 @@ export default function LawyerTicketDashboard({
   const [tickets, setTickets] = useState<LawyerInboxTicket[]>([]);
   const [ticketsLoaded, setTicketsLoaded] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<LawyerInboxTicket | null>(null);
-  const [messages, setMessages] = useState<unknown[]>([]);
+  const [messages, setMessages] = useState<TicketMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [messagesLoading, setMessagesLoading] = useState(false);
@@ -184,7 +185,7 @@ export default function LawyerTicketDashboard({
     setMessagesLoading(true);
     setMessages([]);
     const u = listenToTicketMessages(clientId, ticketId, (newMsgs) => {
-      setMessages(newMsgs as unknown[]);
+      setMessages(newMsgs);
       setMessagesLoading(false);
       setTickets((prev) =>
         prev.map((t) =>
@@ -219,10 +220,10 @@ export default function LawyerTicketDashboard({
     return d.toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" });
   };
 
-  const groupMessagesByDate = (msgs: { timestamp?: unknown }[]) => {
-    const g: Record<string, unknown[]> = {};
+  const groupMessagesByDate = (msgs: TicketMessage[]) => {
+    const g: Record<string, TicketMessage[]> = {};
     msgs.forEach((m) => {
-      const label = getDateLabel(m.timestamp as { toDate?: () => Date; seconds?: number });
+      const label = getDateLabel(m.timestamp);
       if (!g[label]) g[label] = [];
       g[label].push(m);
     });
@@ -285,12 +286,13 @@ export default function LawyerTicketDashboard({
         isRead: false,
         type: "text" as const,
       };
-      const optimistic = {
+      const optimistic: TicketMessage = {
         id: "temp_" + Date.now(),
+        messageId: "temp_" + Date.now(),
         ...payload,
-        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 },
+        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as TicketMessage["timestamp"],
       };
-      setMessages((m) => [...(m as object[]), optimistic]);
+      setMessages((m) => [...m, optimistic]);
       await addTicketMessage(
         clientUserId,
         ticketId,
@@ -300,7 +302,7 @@ export default function LawyerTicketDashboard({
       console.error(err);
       setNewMessage(messageText);
       toast.error("Failed to send.");
-      setMessages((m) => (m as { id: string }[]).filter((x) => !x.id.startsWith("temp_")));
+      setMessages((m) => m.filter((x) => !x.id.startsWith("temp_")));
     } finally {
       setSending(false);
     }
@@ -431,7 +433,7 @@ export default function LawyerTicketDashboard({
                 <p className="text-center text-white/40">Loading messages…</p>
               ) : (
                 <div className="space-y-6">
-                  {Object.entries(groupMessagesByDate(messages as { timestamp?: unknown }[])).map(
+                  {Object.entries(groupMessagesByDate(messages)).map(
                     ([label, list]) => (
                       <div key={label} className="space-y-3">
                         <div className="flex justify-center">
@@ -439,9 +441,9 @@ export default function LawyerTicketDashboard({
                             {label}
                           </span>
                         </div>
-                        {(list as object[]).map((message: Record<string, unknown>) => (
+                        {list.map((message) => (
                           <div
-                            key={(message as { id: string }).id}
+                            key={message.id}
                             className={`flex items-start ${message.senderType === "user" ? "justify-end" : "justify-start"} gap-2`}
                           >
                             <div
@@ -481,10 +483,10 @@ export default function LawyerTicketDashboard({
                                   />
                                 ))}
                               {(!message.type || message.type === "text") && message.message && (
-                                <MessageBody content={String(message.message)} />
+                                <MessageBody content={message.message} />
                               )}
                               <div className="mt-1 text-right text-[11px] text-white/55">
-                                {formatTime(message.timestamp as { seconds?: number; toDate?: () => Date })}
+                                {formatTime(message.timestamp)}
                               </div>
                             </div>
                           </div>

@@ -30,9 +30,12 @@ import {
   markTicketMessagesAsRead,
   type QueueStats,
   type Ticket,
+  type TicketMessage,
   type TicketIntake,
   type IntakeCategory,
 } from "@/lib/ticketFirebase";
+
+type ChatMessage = TicketMessage & { uploading?: boolean };
 import {
   collection,
   doc,
@@ -187,7 +190,7 @@ export default function UserTicketDashboard({
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const [messages, setMessages] = useState<unknown[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [ticketsLoaded, setTicketsLoaded] = useState(false);
@@ -210,9 +213,9 @@ export default function UserTicketDashboard({
   const [hasMoreMessages, setHasMoreMessages] = useState(false);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
 
-  const [editingMessage, setEditingMessage] = useState<unknown>(null);
+  const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(null);
 
-  const [replyingTo, setReplyingTo] = useState<unknown>(null);
+  const [replyingTo, setReplyingTo] = useState<TicketMessage | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [keepKeyboardOpen, setKeepKeyboardOpen] = useState(false);
   const [showChatView, setShowChatView] = useState(false);
@@ -451,7 +454,7 @@ export default function UserTicketDashboard({
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Date.now() - parsed.timestamp < CACHE_DURATION) {
-          setMessages(parsed.messages);
+          setMessages(parsed.messages as ChatMessage[]);
           setOldestMessageTimestamp(parsed.oldestTimestamp);
           setHasMoreMessages(parsed.hasMore);
           setInitialMessagesLoaded(true);
@@ -474,10 +477,9 @@ export default function UserTicketDashboard({
       setMessagesLoading(false);
       return;
     }
-    const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as TicketMessage[];
     fetched.sort(
-      (a: { timestamp?: { seconds?: number } }, b: { timestamp?: { seconds?: number } }) =>
-        (a.timestamp?.seconds ?? 0) - (b.timestamp?.seconds ?? 0),
+      (a, b) => (a.timestamp?.seconds ?? 0) - (b.timestamp?.seconds ?? 0),
     );
     setMessages(fetched);
     const oldest = snap.docs[snap.docs.length - 1].data().timestamp;
@@ -509,18 +511,14 @@ export default function UserTicketDashboard({
     const u = listenToTicketMessages(userId, selectedTicket.ticketId, (newMsgs) => {
       setMessages((prev) => {
         const ids = new Set(newMsgs.map((m) => m.id));
-        const prevArr = prev as { id: string }[];
-        const map = new Map<string, unknown>();
-        prevArr.forEach((msg) => {
+        const map = new Map<string, ChatMessage>();
+        prev.forEach((msg) => {
           if (msg.id.startsWith("temp_") || msg.id.startsWith("upload_")) return;
-          if (ids.has(msg.id) || prevArr.length > newMsgs.length) map.set(msg.id, msg);
+          if (ids.has(msg.id) || prev.length > newMsgs.length) map.set(msg.id, msg);
         });
         newMsgs.forEach((m) => map.set(m.id, m));
-        const combined = Array.from(map.values()) as typeof prev;
-        combined.sort(
-          (a: { timestamp?: { seconds?: number } }, b: { timestamp?: { seconds?: number } }) =>
-            (a.timestamp?.seconds ?? 0) - (b.timestamp?.seconds ?? 0),
-        );
+        const combined = Array.from(map.values());
+        combined.sort((a, b) => (a.timestamp?.seconds ?? 0) - (b.timestamp?.seconds ?? 0));
         return combined;
       });
       markTicketMessagesAsRead(userId, selectedTicket.ticketId);
@@ -582,16 +580,13 @@ export default function UserTicketDashboard({
         setHasMoreMessages(false);
         return;
       }
-      const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const fetched = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as TicketMessage[];
       setMessages((prev) => {
-        const map = new Map<string, unknown>();
-        fetched.forEach((m: { id: string }) => map.set(m.id, m));
-        (prev as { id: string }[]).forEach((m) => map.set(m.id, m));
-        const arr = Array.from(map.values()) as typeof prev;
-        arr.sort(
-          (a: { timestamp?: { seconds?: number } }, b: { timestamp?: { seconds?: number } }) =>
-            (a.timestamp?.seconds ?? 0) - (b.timestamp?.seconds ?? 0),
-        );
+        const map = new Map<string, ChatMessage>();
+        fetched.forEach((m) => map.set(m.id, m));
+        prev.forEach((m) => map.set(m.id, m));
+        const arr = Array.from(map.values());
+        arr.sort((a, b) => (a.timestamp?.seconds ?? 0) - (b.timestamp?.seconds ?? 0));
         return arr;
       });
       setOldestMessageTimestamp(snap.docs[snap.docs.length - 1].data().timestamp);
@@ -693,13 +688,7 @@ export default function UserTicketDashboard({
         isRead: false,
         type: "text",
       };
-      const rt = replyingTo as {
-        id: string;
-        message?: string;
-        senderName?: string;
-        senderType?: string;
-        imageUrls?: string[];
-      } | null;
+      const rt = replyingTo;
       if (rt?.id && !rt.id.startsWith("temp_")) {
         messageData.replyTo = {
           id: rt.id,
@@ -729,12 +718,23 @@ export default function UserTicketDashboard({
           }
         }
       }
-      const optimistic = {
+      const optimistic: ChatMessage = {
         id: "temp_" + Date.now(),
-        ...messageData,
-        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 },
+        messageId: "temp_" + Date.now(),
+        ticketId: selectedTicket.ticketId,
+        senderId: userId,
+        senderName: userUid,
+        senderType: "user",
+        message: messageText,
+        isRead: false,
+        type: (messageData.type as TicketMessage["type"]) ?? "text",
+        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as TicketMessage["timestamp"],
+        ...(messageData.replyTo ? { replyTo: messageData.replyTo as TicketMessage["replyTo"] } : {}),
+        ...(messageData.imageUrls ? { imageUrls: messageData.imageUrls as string[] } : {}),
+        ...(messageData.imageUrl ? { imageUrl: messageData.imageUrl as string } : {}),
+        ...(messageData.documentName ? { documentName: messageData.documentName as string } : {}),
       };
-      setMessages((m) => [...(m as object[]), optimistic]);
+      setMessages((m) => [...m, optimistic]);
       await addTicketMessage(
         userId,
         selectedTicket.ticketId,
@@ -747,14 +747,14 @@ export default function UserTicketDashboard({
       console.error(err);
       setNewMessage(messageText);
       toast.error("Failed to send.");
-      setMessages((m) => (m as { id: string }[]).filter((x) => !x.id.startsWith("temp_")));
+      setMessages((m) => m.filter((x) => !x.id.startsWith("temp_")));
     } finally {
       setSending(false);
     }
   };
 
   const handleEditMessage = async () => {
-    const em = editingMessage as { id: string; type?: string; imageUrls?: string[]; imageUrl?: string };
+    const em = editingMessage;
     if (!em || !selectedTicket) return;
     try {
       const updateData: Record<string, unknown> = { edited: true };
@@ -787,7 +787,7 @@ export default function UserTicketDashboard({
     }
   };
 
-  const canEditMessage = (message: { senderType?: string; timestamp?: { toDate?: () => Date; seconds?: number } }) => {
+  const canEditMessage = (message: TicketMessage) => {
     if (message.senderType !== "user") return false;
     const t =
       message.timestamp?.toDate?.().getTime() ??
@@ -832,15 +832,16 @@ export default function UserTicketDashboard({
     let msgType: "image" | "images" | "video" | "document" =
       fileType === "image" ? (files.length > 1 ? "images" : "image") : fileType === "video" ? "video" : "document";
     setMessages((prev) => [
-      ...(prev as object[]),
+      ...prev,
       {
         id: uploadMsgId,
+        messageId: uploadMsgId,
         ticketId: selectedTicket.ticketId,
         senderId: userId,
         senderName: userUid,
         senderType: "user",
         message: "",
-        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 },
+        timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as TicketMessage["timestamp"],
         isRead: false,
         type: msgType,
         imageUrls: blobs,
@@ -862,7 +863,7 @@ export default function UserTicketDashboard({
       }
       if (cancelledUploadsRef.current.has(uploadMsgId)) {
         cancelledUploadsRef.current.delete(uploadMsgId);
-        setMessages((p) => (p as { id: string }[]).filter((x) => x.id !== uploadMsgId));
+        setMessages((p) => p.filter((x) => x.id !== uploadMsgId));
         return;
       }
       const messageData: Record<string, unknown> = {
@@ -884,7 +885,7 @@ export default function UserTicketDashboard({
         }
       }
       setMessages((prev) =>
-        (prev as { id: string }[]).map((m) =>
+        prev.map((m) =>
           m.id === uploadMsgId ? { ...m, imageUrls: urls, imageUrl: urls[0], uploading: false } : m,
         ),
       );
@@ -896,7 +897,7 @@ export default function UserTicketDashboard({
     } catch (err) {
       console.error(err);
       toast.error((err as Error).message || "Upload failed. Configure Cloudinary env vars.");
-      setMessages((p) => (p as { id: string }[]).filter((x) => x.id !== uploadMsgId));
+      setMessages((p) => p.filter((x) => x.id !== uploadMsgId));
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -953,10 +954,10 @@ export default function UserTicketDashboard({
     return d.toLocaleDateString("en-US", { day: "2-digit", month: "2-digit", year: "numeric" });
   };
 
-  const groupMessagesByDate = (msgs: { timestamp?: unknown }[]) => {
-    const g: Record<string, unknown[]> = {};
+  const groupMessagesByDate = (msgs: ChatMessage[]) => {
+    const g: Record<string, ChatMessage[]> = {};
     msgs.forEach((m) => {
-      const label = getDateLabel(m.timestamp as { toDate?: () => Date; seconds?: number });
+      const label = getDateLabel(m.timestamp);
       if (!g[label]) g[label] = [];
       g[label].push(m);
     });
@@ -1092,7 +1093,7 @@ export default function UserTicketDashboard({
                 <p className="text-center text-white/40">Loading messages…</p>
               ) : (
                 <div className="space-y-6">
-                  {Object.entries(groupMessagesByDate(messages as { timestamp?: unknown }[])).map(
+                  {Object.entries(groupMessagesByDate(messages)).map(
                     ([label, list]) => (
                       <div key={label} className="space-y-3">
                         <div className="flex justify-center">
@@ -1100,9 +1101,9 @@ export default function UserTicketDashboard({
                             {label}
                           </span>
                         </div>
-                        {(list as object[]).map((message: Record<string, unknown>) => (
+                        {list.map((message) => (
                           <div
-                            key={(message as { id: string }).id}
+                            key={message.id}
                             className={`flex items-start ${message.senderType === "user" ? "justify-end" : "justify-start"} gap-2`}
                           >
                             {message.senderType === "user" && (
@@ -1114,18 +1115,13 @@ export default function UserTicketDashboard({
                                 >
                                   <Reply className="h-3.5 w-3.5" />
                                 </button>
-                                {canEditMessage(
-                                  message as {
-                                    senderType?: string;
-                                    timestamp?: { seconds?: number; toDate?: () => Date };
-                                  },
-                                ) && (
+                                {canEditMessage(message) && (
                                   <button
                                     type="button"
                                     className="rounded-lg border border-[#d4af37]/30 bg-[#2a1815]/80 p-1.5 text-[#d4af37]"
                                     onClick={() => {
                                       setEditingMessage(message);
-                                      setNewMessage(String(message.message || ""));
+                                      setNewMessage(message.message || "");
                                     }}
                                   >
                                     <Edit2 className="h-3.5 w-3.5" />
@@ -1178,10 +1174,10 @@ export default function UserTicketDashboard({
                                   />
                                 ))}
                               {(!message.type || message.type === "text") && message.message && (
-                                <MessageBody content={String(message.message)} />
+                                <MessageBody content={message.message} />
                               )}
                               <div className="mt-1 text-right text-[11px] text-white/55">
-                                {formatTime(message.timestamp as { seconds?: number; toDate?: () => Date })}
+                                {formatTime(message.timestamp)}
                               </div>
                             </div>
                           </div>

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ reply: getGreetingReply(), source: "greeting" });
     }
 
-    const context = await loadKnowledgeContext();
+    const context = await loadKnowledgeContext(message);
 
     try {
       const llm = await tryLlmReply(context, message);
