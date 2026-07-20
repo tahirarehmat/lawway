@@ -6,6 +6,7 @@ import {
   Sidebar,
   type SidebarNavLabel,
 } from "@/app/components/layout/sidebar";
+import { cn } from "@/lib/utils";
 
 type DashboardShellProps = {
   session: SessionPayload;
@@ -13,12 +14,15 @@ type DashboardShellProps = {
   showSupport?: boolean;
   /** Kept for call-site compatibility; top bar was removed */
   ticketsLinkLabel?: string;
+  /** Fill viewport height without page scroll (chat / messaging UIs) */
+  fillViewport?: boolean;
   children: ReactNode;
 };
 
 export function DashboardShell({
   session,
   activeItem = "Home",
+  fillViewport = false,
   children,
 }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -31,7 +35,12 @@ export function DashboardShell({
         collapsed={collapsed}
         onToggle={() => setCollapsed((prev) => !prev)}
       />
-      <div className="dashboard-grid-bg min-h-0 min-w-0 flex-1 overflow-y-auto">
+      <div
+        className={cn(
+          "dashboard-grid-bg min-h-0 min-w-0 flex-1",
+          fillViewport ? "flex flex-col overflow-hidden" : "overflow-y-auto",
+        )}
+      >
         {children}
       </div>
     </div>

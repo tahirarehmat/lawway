@@ -16,7 +16,11 @@ export async function POST(request: Request, context: RouteContext) {
     }
 
     const { caseId } = await context.params;
-    const body = (await request.json()) as { summary?: string };
+    const body = (await request.json()) as {
+      summary?: string;
+      startedAtMs?: number;
+      endedAtMs?: number;
+    };
     const summary = String(body.summary ?? "").trim();
 
     if (!summary) {
@@ -31,11 +35,16 @@ export async function POST(request: Request, context: RouteContext) {
       session.userId,
       session.role,
       summary,
+      {
+        startedAtMs:
+          typeof body.startedAtMs === "number" ? body.startedAtMs : null,
+        endedAtMs: typeof body.endedAtMs === "number" ? body.endedAtMs : null,
+      },
     );
 
     return NextResponse.json({ event }, { status: 201 });
   } catch (error) {
-    console.error("Demo meeting failed:", error);
+    console.error("Meeting record failed:", error);
     const message =
       error instanceof Error ? error.message : "Unable to record meeting.";
     const status =

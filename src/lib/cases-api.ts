@@ -106,6 +106,7 @@ export async function fetchCaseEvents(caseId: string): Promise<ClientCaseEvent[]
 export async function recordDemoMeeting(
   caseId: string,
   summary: string,
+  options?: { startedAtMs?: number | null; endedAtMs?: number | null },
 ): Promise<ClientCaseEvent> {
   const res = await fetch(
     `/api/cases/${encodeURIComponent(caseId)}/demo-meeting`,
@@ -114,7 +115,11 @@ export async function recordDemoMeeting(
       credentials: "include",
       cache: "no-store",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ summary }),
+      body: JSON.stringify({
+        summary,
+        startedAtMs: options?.startedAtMs ?? undefined,
+        endedAtMs: options?.endedAtMs ?? undefined,
+      }),
     },
   );
   if (!res.ok) throw new Error(await parseError(res));

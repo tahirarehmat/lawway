@@ -3,6 +3,7 @@ import { getServerSession } from "@/lib/auth";
 import {
   filterClientEvents,
   getClientCaseEvents,
+  getLawyerCaseEvents,
   listLawyerUpcomingHearings,
   type EventTimeFilter,
 } from "@/lib/case-events";
@@ -20,6 +21,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const filterParam = (searchParams.get("filter") ?? "all") as EventTimeFilter;
     const filter = VALID_FILTERS.has(filterParam) ? filterParam : "all";
+    const view = searchParams.get("view");
+    const hearingsOnly = searchParams.get("type") === "hearing";
 
     if (session.role === "client") {
       const events = await getClientCaseEvents(session.userId);
@@ -28,8 +31,18 @@ export async function GET(request: Request) {
     }
 
     if (session.role === "lawyer") {
-      const events = await listLawyerUpcomingHearings(session.userId, 20);
-      return NextResponse.json({ events });
+      // Home dashboard: upcoming hearings snapshot (no view=calendar)
+      if (view !== "calendar") {
+        const events = await listLawyerUpcomingHearings(session.userId, 20);
+        return NextResponse.json({ events });
+      }
+
+      let events = await getLawyerCaseEvents(session.userId);
+      if (hearingsOnly) {
+        events = events.filter((e) => e.eventType === "hearing");
+      }
+      const filtered = filterClientEvents(events, filter);
+      return NextResponse.json({ events: filtered });
     }
 
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });

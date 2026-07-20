@@ -104,6 +104,7 @@ export default function LawyerTicketDashboard({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const r = () => setIsCompact(typeof window !== "undefined" && window.innerWidth <= 640);
@@ -197,7 +198,9 @@ export default function LawyerTicketDashboard({
   }, [selectedTicket?.ticketId, selectedTicket?.clientUserId, selectedTicket?.id, lawyerUserId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   }, [messages.length]);
 
   const formatTime = (timestamp: { toDate?: () => Date; seconds?: number }) => {
@@ -309,7 +312,7 @@ export default function LawyerTicketDashboard({
   const isPdfDocument = (url: string) => /\.pdf$/i.test(url) || url.includes("pdf");
 
   return (
-    <div className="flex h-[var(--ticket-h,100dvh)] w-full overflow-hidden bg-background">
+    <div className="flex h-full min-h-0 w-full overflow-hidden bg-background">
       {sidebarOpen && !isCompact && (
         <div
           className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm md:hidden"
@@ -426,7 +429,10 @@ export default function LawyerTicketDashboard({
               </div>
             </div>
 
-            <div className="scrollbar-themed min-h-0 flex-1 overflow-y-auto p-3 md:p-6">
+            <div
+              ref={messagesContainerRef}
+              className="scrollbar-themed min-h-0 flex-1 overflow-y-auto p-3 md:p-6"
+            >
               {messagesLoading && messages.length === 0 ? (
                 <p className="text-center text-muted-foreground">Loading messages…</p>
               ) : (

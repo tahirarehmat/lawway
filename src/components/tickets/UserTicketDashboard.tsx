@@ -202,6 +202,7 @@ export default function UserTicketDashboard({
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const docxContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const cancelledUploadsRef = useRef<Set<string>>(new Set());
@@ -441,7 +442,9 @@ export default function UserTicketDashboard({
   }, [tickets, selectedTicket?.ticketId]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   };
 
   const fetchInitialMessages = async (uid: string, ticketId: string) => {
@@ -991,9 +994,7 @@ export default function UserTicketDashboard({
   };
 
   return (
-    <div
-      className={`${isCompact ? "h-full" : "h-[var(--ticket-h,100dvh)]"} flex w-full overflow-hidden bg-background`}
-    >
+    <div className="flex h-full min-h-0 w-full overflow-hidden bg-background">
       <UserTicketSidebar
         tickets={tickets}
         selectedTicket={selectedTicket}
@@ -1074,7 +1075,10 @@ export default function UserTicketDashboard({
                 )}
             </div>
 
-            <div className="scrollbar-themed min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6">
+            <div
+              ref={messagesContainerRef}
+              className="scrollbar-themed min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 md:p-6"
+            >
               {hasMoreMessages && (
                 <div className="flex justify-center pb-3">
                   <button

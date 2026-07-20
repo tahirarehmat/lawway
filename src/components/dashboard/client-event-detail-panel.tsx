@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
 import type { ClientCaseEvent } from "@/lib/case-events";
 import {
@@ -62,7 +63,15 @@ export function ClientEventDetailPanel({ event, onClose }: ClientEventDetailPane
             {event.title}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">{event.caseTitle}</p>
-          <p className="mt-1 text-sm text-muted-foreground">Counsel: {event.lawyerName}</p>
+          {event.clientName ? (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Client: {event.clientName}
+            </p>
+          ) : (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Counsel: {event.lawyerName}
+            </p>
+          )}
 
           <dl className="mt-6 space-y-4 text-sm">
             <div>
@@ -100,6 +109,13 @@ export function ClientEventDetailPanel({ event, onClose }: ClientEventDetailPane
               </div>
             ) : null}
           </dl>
+
+          <Link
+            href={`/dashboard/cases/${event.caseId}`}
+            className="mt-8 inline-flex text-sm font-medium text-primary hover:underline"
+          >
+            Open case file
+          </Link>
         </div>
       </aside>
     </div>

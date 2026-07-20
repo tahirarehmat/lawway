@@ -71,3 +71,11 @@ export async function uploadDocumentToCloudinaryDirect(file: File): Promise<stri
     folder: "lawway/tickets/documents",
   });
 }
+
+/** Case vault files (PDF / Office / images as raw or image) */
+export async function uploadCaseVaultFileToCloudinary(file: File): Promise<string> {
+  const isImage = file.type.startsWith("image/");
+  return uploadToCloudinary(isImage ? "image" : "raw", file, {
+    folder: "lawway/case-documents",
+  });
+}

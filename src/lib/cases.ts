@@ -194,7 +194,7 @@ export async function listLawyerCases(lawyerId: string): Promise<CaseListItem[]>
   return rows.map(mapListRow);
 }
 
-async function assertCaseAccess(
+export async function assertCaseAccess(
   caseId: string,
   userId: string,
   role: "client" | "lawyer",

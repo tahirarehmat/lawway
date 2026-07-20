@@ -26,9 +26,9 @@ const SHARED_NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: LayoutGrid },
   { label: "Requests", href: "/dashboard/requests", icon: Inbox },
   { label: "My Cases", href: "/dashboard/cases", icon: Briefcase },
-  { label: "Hearing Calendar", href: "#", icon: Calendar },
-  { label: "Legal AI", href: "#", icon: Bot },
-  { label: "Documents", href: "#", icon: FileText },
+  { label: "Hearing Calendar", href: "/dashboard/calendar", icon: Calendar },
+  { label: "Legal AI", href: "/dashboard/legal-ai", icon: Bot },
+  { label: "Documents", href: "/dashboard/documents", icon: FileText },
 ] as const;
 
 const CLIENT_NAV_ITEMS = [
@@ -44,7 +44,8 @@ const LAWYER_NAV_ITEMS = [
 export type SidebarNavLabel =
   | (typeof SHARED_NAV_ITEMS)[number]["label"]
   | (typeof CLIENT_NAV_ITEMS)[number]["label"]
-  | (typeof LAWYER_NAV_ITEMS)[number]["label"];
+  | (typeof LAWYER_NAV_ITEMS)[number]["label"]
+  | "Settings";
 
 type SidebarProps = {
   role?: "client" | "lawyer";
@@ -224,12 +225,15 @@ export function Sidebar({
           )}
         >
           <Link
-            href="#"
+            href="/dashboard/settings"
             title="Settings"
             aria-label="Settings"
             className={cn(
-              "flex items-center rounded-lg text-sm text-white/75 transition hover:bg-white/10 hover:text-white",
+              "flex items-center rounded-lg text-sm transition",
               collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
+              activeItem === "Settings"
+                ? "bg-primary font-medium text-secondary"
+                : "text-white/75 hover:bg-white/10 hover:text-white",
             )}
           >
             <Settings className="size-4 shrink-0" />

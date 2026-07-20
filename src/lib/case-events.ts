@@ -20,6 +20,7 @@ export type ClientCaseEvent = {
   caseId: string;
   caseTitle: string;
   lawyerName: string;
+  clientName?: string | null;
   eventType: CaseEventType;
   title: string;
   description: string | null;
@@ -48,6 +49,7 @@ type CaseEventRow = {
   case_id: string;
   case_title: string;
   lawyer_name: string;
+  client_name?: string | null;
   event_type: CaseEventType;
   title: string;
   description: string | null;
@@ -93,6 +95,7 @@ function mapRow(row: CaseEventRow): ClientCaseEvent {
     caseId: row.case_id,
     caseTitle: row.case_title,
     lawyerName: row.lawyer_name,
+    clientName: row.client_name ?? null,
     eventType: row.event_type,
     title: row.title,
     description: row.description,
@@ -196,8 +199,10 @@ export async function listLawyerUpcomingHearings(
 ): Promise<ClientCaseEvent[]> {
   const pool = getPool();
   const { rows } = await pool.query<CaseEventRow>(
-    `SELECT ${CLIENT_EVENT_SELECT}
+    `SELECT ${CLIENT_EVENT_SELECT},
+            COALESCE(cp.full_name, 'Client') AS client_name
      ${CLIENT_EVENT_FROM}
+     LEFT JOIN client_profiles cp ON cp.user_id = c.client_id
      WHERE c.lawyer_id = $1
        AND ce.event_type = 'hearing'
        AND ce.status = 'scheduled'
@@ -210,11 +215,51 @@ export async function listLawyerUpcomingHearings(
   return rows.map(mapRow);
 }
 
+const LAWYER_EVENT_SELECT = `
+  ce.event_id,
+  ce.case_id,
+  c.title AS case_title,
+  COALESCE(lp.full_name, 'Assigned counsel') AS lawyer_name,
+  COALESCE(cp.full_name, 'Client') AS client_name,
+  ce.event_type,
+  ce.title,
+  ce.description,
+  ce.starts_at,
+  ce.ends_at,
+  ce.location,
+  ce.priority,
+  ce.status,
+  ce.created_at
+`;
+
+export async function getLawyerCaseEvents(
+  lawyerId: string,
+): Promise<ClientCaseEvent[]> {
+  const pool = getPool();
+  const { rows } = await pool.query<CaseEventRow>(
+    `SELECT ${LAWYER_EVENT_SELECT}
+     FROM case_events ce
+     INNER JOIN cases c ON c.case_id = ce.case_id
+     LEFT JOIN lawyer_profiles lp ON lp.user_id = c.lawyer_id
+     LEFT JOIN client_profiles cp ON cp.user_id = c.client_id
+     WHERE c.lawyer_id = $1
+       AND ce.visible_to IN ('lawyer_only', 'both')
+     ORDER BY
+       CASE WHEN ce.status = 'scheduled' THEN 0 ELSE 1 END,
+       ce.starts_at ASC NULLS LAST,
+       ce.created_at DESC`,
+    [lawyerId],
+  );
+
+  return rows.map(mapRow);
+}
+
 export async function recordDemoMeeting(
   caseId: string,
   userId: string,
   role: "client" | "lawyer",
   summary: string,
+  options?: { startedAtMs?: number | null; endedAtMs?: number | null },
 ): Promise<ClientCaseEvent> {
   const pool = getPool();
   const access = await pool.query<{
@@ -230,8 +275,12 @@ export async function recordDemoMeeting(
     role === "client" ? row.client_id === userId : row.lawyer_id === userId;
   if (!allowed) throw new Error("Forbidden.");
 
-  const endedAt = new Date();
-  const startedAt = new Date(endedAt.getTime() - 5 * 60 * 1000);
+  const endedAt = options?.endedAtMs
+    ? new Date(options.endedAtMs)
+    : new Date();
+  const startedAt = options?.startedAtMs
+    ? new Date(options.startedAtMs)
+    : new Date(endedAt.getTime() - 60 * 1000);
   const title = `Video consultation — ${row.title}`;
 
   const { rows } = await pool.query<CaseEventRow>(
@@ -241,7 +290,7 @@ export async function recordDemoMeeting(
          starts_at, ends_at, location, priority, status, visible_to
        ) VALUES (
          $1, $2, 'meeting'::case_event_type, $3, $4,
-         $5, $6, 'Lawway video (demo)', 'normal'::case_event_priority,
+         $5, $6, 'Lawway video call', 'normal'::case_event_priority,
          'completed'::case_event_status, 'both'::case_event_visibility
        )
        RETURNING *

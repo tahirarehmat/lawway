@@ -37,8 +37,9 @@ export default async function TicketsPage({ searchParams }: PageProps) {
         activeItem="Messages"
         showSupport
         ticketsLinkLabel="Messages"
+        fillViewport
       >
-        <div className="flex min-h-0 flex-1 flex-col [--ticket-h:calc(100dvh-7rem)] md:[--ticket-h:calc(100dvh-4rem)]">
+        <div className="flex min-h-0 flex-1 flex-col">
           <LawyerTicketDashboard
             lawyerUserId={session.userId}
             lawyerSenderName={displayNameFromEmail(session.email)}
@@ -53,8 +54,8 @@ export default async function TicketsPage({ searchParams }: PageProps) {
   }
 
   return (
-    <DashboardShell session={session} activeItem="Support" showSupport>
-      <div className="flex min-h-0 flex-1 flex-col [--ticket-h:calc(100dvh-7rem)] md:[--ticket-h:calc(100dvh-4rem)]">
+    <DashboardShell session={session} activeItem="Support" showSupport fillViewport>
+      <div className="flex min-h-0 flex-1 flex-col">
         <UserTicketDashboard
           userId={session.userId}
           userUid={session.email}

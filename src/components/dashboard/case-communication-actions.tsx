@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { MessageCircle, Phone, Video } from "lucide-react";
 import type { CaseDetail } from "@/lib/cases";
 import { ensureCaseChatTicket } from "@/lib/ticketFirebase";
-import { DemoMeetingModal } from "@/components/dashboard/demo-meeting-modal";
+import { endVideoCall, type VideoCallDoc } from "@/lib/videoCallFirebase";
+import { VideoCallModal } from "@/components/dashboard/video-call-modal";
+import { IncomingCallBanner } from "@/components/dashboard/incoming-call-banner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -28,8 +30,12 @@ export function CaseCommunicationActions({
 }: CaseCommunicationActionsProps) {
   const router = useRouter();
   const [openingChat, setOpeningChat] = useState(false);
-  const [meetingOpen, setMeetingOpen] = useState(false);
+  const [callOpen, setCallOpen] = useState(false);
+  const [callMode, setCallMode] = useState<"video" | "voice">("video");
+  const [joinCallId, setJoinCallId] = useState<string | null>(null);
 
+  const localUserId =
+    role === "lawyer" ? caseDetail.lawyerId : caseDetail.clientId;
   const remoteName =
     role === "lawyer" ? caseDetail.clientName : caseDetail.lawyerName;
 
@@ -67,15 +73,35 @@ export function CaseCommunicationActions({
     }
   }
 
-  function startVoiceDemo() {
-    toast.message("Voice call (demo)", {
-      description: `Connecting with ${remoteName}… Full calling coming soon.`,
-      duration: 4000,
-    });
+  function startCall(mode: "video" | "voice", joinId: string | null = null) {
+    setCallMode(mode);
+    setJoinCallId(joinId);
+    setCallOpen(true);
+  }
+
+  async function declineCall(call: VideoCallDoc) {
+    try {
+      await endVideoCall({
+        callId: call.callId,
+        endedById: localUserId,
+        endedByName: localDisplayName,
+      });
+      toast.message("Call declined");
+    } catch {
+      toast.error("Could not decline call.");
+    }
   }
 
   return (
     <>
+      <IncomingCallBanner
+        userId={localUserId}
+        role={role}
+        caseId={caseDetail.caseId}
+        onAccept={(call) => startCall(call.mode, call.callId)}
+        onDismiss={(call) => void declineCall(call)}
+      />
+
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
@@ -95,7 +121,7 @@ export function CaseCommunicationActions({
           variant="outline"
           size="sm"
           className="gap-1.5"
-          onClick={startVoiceDemo}
+          onClick={() => startCall("voice")}
         >
           <Phone className="size-3.5" aria-hidden />
           Voice call
@@ -108,21 +134,31 @@ export function CaseCommunicationActions({
             buttonVariants({ variant: "outline", size: "sm" }),
             "gap-1.5",
           )}
-          onClick={() => setMeetingOpen(true)}
+          onClick={() => startCall("video")}
         >
           <Video className="size-3.5" aria-hidden />
           Meeting
         </Button>
       </div>
 
-      <DemoMeetingModal
-        open={meetingOpen}
+      <VideoCallModal
+        open={callOpen}
         caseId={caseDetail.caseId}
         caseTitle={caseDetail.title}
+        clientId={caseDetail.clientId}
+        lawyerId={caseDetail.lawyerId}
+        clientName={caseDetail.clientName}
+        lawyerName={caseDetail.lawyerName}
+        localUserId={localUserId}
         localName={localDisplayName}
         remoteName={remoteName}
         role={role}
-        onClose={() => setMeetingOpen(false)}
+        mode={callMode}
+        joinCallId={joinCallId}
+        onClose={() => {
+          setCallOpen(false);
+          setJoinCallId(null);
+        }}
         onMeetingRecorded={onMeetingRecorded}
       />
     </>

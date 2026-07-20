@@ -11,6 +11,7 @@ import { fetchCaseDetail, fetchCaseEvents } from "@/lib/cases-api";
 import { CaseProgressTimeline } from "@/components/dashboard/case-progress-timeline";
 import { CreateCaseEventForm } from "@/components/dashboard/create-case-event-form";
 import { LawyerStageActions } from "@/components/dashboard/lawyer-stage-actions";
+import { CaseDocumentsSection } from "@/components/dashboard/case-documents-section";
 import { Button } from "@/components/ui/button";
 import { CaseCommunicationActions } from "@/components/dashboard/case-communication-actions";
 
@@ -223,6 +224,8 @@ export function CaseDetailView({
               </ul>
             )}
           </section>
+
+          <CaseDocumentsSection caseId={caseId} role={role} />
         </div>
 
         <aside className="space-y-6">
