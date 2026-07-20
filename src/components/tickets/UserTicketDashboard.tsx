@@ -32,8 +32,6 @@ import {
   type TicketIntake,
   type IntakeCategory,
 } from "@/lib/ticketFirebase";
-
-type ChatMessage = TicketMessage & { uploading?: boolean };
 import {
   collection,
   doc,
@@ -54,6 +52,8 @@ import {
 } from "@/lib/cloudinaryTicketUploads";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { LawyerSearchResult } from "@/lib/lawyers";
+
+type ChatMessage = TicketMessage & { uploading?: boolean };
 
 const INITIAL_MESSAGES_LIMIT = 20;
 const CACHE_DURATION = 300000;

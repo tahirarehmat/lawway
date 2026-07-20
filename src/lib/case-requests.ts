@@ -1,4 +1,4 @@
-import { getPool } from "@/lib/db";
+import { getPool, type DbClient } from "@/lib/db";
 import { DEFAULT_CASE_STAGE_TEMPLATE } from "@/lib/case-stage-templates";
 
 export type CaseRequestStatus = "pending" | "accepted" | "cancelled";
@@ -199,10 +199,7 @@ export async function listLawyerRequests(lawyerId: string): Promise<CaseRequest[
   return repairOrphanedAcceptedRequests(rows.map(mapRequestRow));
 }
 
-type PgQueryable = Pick<
-  Awaited<ReturnType<ReturnType<typeof getPool>["connect"]>>,
-  "query"
->;
+type PgQueryable = Pick<DbClient, "query"> | Pick<ReturnType<typeof getPool>, "query">;
 
 export async function seedDefaultCaseStages(
   db: PgQueryable,

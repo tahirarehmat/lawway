@@ -1,4 +1,4 @@
-import { getPool } from "@/lib/db";
+import { getPool, type DbClient } from "@/lib/db";
 import { assertLawyerOwnsCase, type CaseStage, type CaseStageStatus } from "@/lib/cases";
 
 export type StageAction = "stage_started" | "stage_completed" | "stage_skipped";
@@ -48,7 +48,7 @@ export async function advanceStage(
   await assertLawyerOwnsCase(caseId, lawyerId);
 
   const pool = getPool();
-  const client = await pool.connect();
+  const client = (await pool.connect()) as DbClient;
   const toStatus = ACTION_TO_STATUS[action];
 
   try {
@@ -168,7 +168,7 @@ export async function advanceStage(
 }
 
 async function listStagesForCase(
-  client: Awaited<ReturnType<ReturnType<typeof getPool>["connect"]>>,
+  client: DbClient,
   caseId: string,
 ): Promise<CaseStage[]> {
   const allStages = await client.query<CaseStageRow>(
@@ -190,7 +190,7 @@ export async function addCaseStage(
   if (!title) throw new Error("Stage title is required.");
 
   const pool = getPool();
-  const client = await pool.connect();
+  const client = (await pool.connect()) as DbClient;
 
   try {
     await client.query("BEGIN");
@@ -243,7 +243,7 @@ export async function removeCaseStage(
   await assertLawyerOwnsCase(caseId, lawyerId);
 
   const pool = getPool();
-  const client = await pool.connect();
+  const client = (await pool.connect()) as DbClient;
 
   try {
     await client.query("BEGIN");
