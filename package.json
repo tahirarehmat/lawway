@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
-    "@base-ui/react": "^1.4.1",
-    "@cyntler/react-doc-viewer": "^1.17.0",
     "@google/generative-ai": "^0.24.1",
     "@neondatabase/serverless": "^1.1.0",
     "bcryptjs": "^3.0.3",
@@ -45,5 +43,8 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "ws": "^8.20.1"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
   }
 }

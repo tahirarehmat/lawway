@@ -37,39 +37,31 @@ export function CasesList({ role }: CasesListProps) {
 
   return (
     <div className="mx-auto ">
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
-            {role === "client" ? "Your matters" : "Case files"}
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-secondary">
-            My Cases
-          </h1>
-        </div>
-        {role === "client" ? (
+      {role === "client" ? (
+        <header className="mb-8 flex justify-end">
           <Link
             href="/dashboard/requests/new"
             className={cn(
               buttonVariants({ variant: "default" }),
-              "inline-flex gap-2 bg-primary text-secondary hover:bg-primary/90",
+              "inline-flex gap-2",
             )}
           >
             <Plus className="size-4" aria-hidden />
             New request
           </Link>
-        ) : null}
-      </header>
+        </header>
+      ) : null}
 
       {loading ? (
-        <p className="text-sm text-neutral/55">Loading…</p>
+        <p className="text-sm text-muted-foreground">Loading…</p>
       ) : error ? (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-4">
-          <p className="text-sm text-rose-800">{error}</p>
+        <div className="rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-4">
+          <p className="text-sm text-red-300">{error}</p>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            className="mt-3 border-rose-300"
+            className="mt-3"
             onClick={() => void load()}
           >
             <RefreshCw className="mr-1.5 size-3.5" aria-hidden />
@@ -79,7 +71,7 @@ export function CasesList({ role }: CasesListProps) {
       ) : (
         <>
           {role === "client" ? (
-            <p className="mb-6 text-sm text-neutral/60">
+            <p className="mb-6 text-sm text-muted-foreground">
               Track pending and past submissions on{" "}
               <Link href="/dashboard/requests" className="font-medium text-primary hover:underline">
                 Requests
@@ -89,14 +81,14 @@ export function CasesList({ role }: CasesListProps) {
           ) : null}
 
           <section>
-            <h2 className="mb-3 font-serif text-lg font-medium text-secondary">
+            <h2 className="mb-3 text-lg font-semibold tracking-tight text-foreground">
               {role === "client" ? "Active cases" : "All cases"}
             </h2>
             {cases.length === 0 ? (
               <div className="dashboard-card-muted flex flex-col items-center px-6 py-14 text-center">
-                <Briefcase className="size-10 text-neutral/35" aria-hidden />
-                <p className="mt-4 font-medium text-secondary">No cases yet</p>
-                <p className="mt-1 max-w-sm text-sm text-neutral/55">
+                <Briefcase className="size-10 text-muted-foreground" aria-hidden />
+                <p className="mt-4 font-medium text-foreground">No cases yet</p>
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
                   {role === "client"
                     ? "Accepted requests appear here as active case files."
                     : "Accepted requests will appear here as active case files."}
@@ -108,20 +100,20 @@ export function CasesList({ role }: CasesListProps) {
                   <li key={c.caseId}>
                     <Link
                       href={`/dashboard/cases/${c.caseId}`}
-                      className="dashboard-card group flex items-center justify-between gap-4 p-4 transition hover:border-[var(--dashboard-border-hover)]"
+                      className="dashboard-card-interactive group flex items-center justify-between gap-4 p-4"
                     >
                       <div className="min-w-0">
-                        <p className="font-medium text-secondary group-hover:text-primary">
+                        <p className="font-medium text-foreground group-hover:text-primary">
                           {c.title}
                         </p>
-                        <p className="mt-1 text-sm text-neutral/60">
+                        <p className="mt-1 text-sm text-muted-foreground">
                           {role === "client"
                             ? `Counsel: ${c.lawyerName}`
                             : `Client: ${c.clientName}`}
                           {c.currentStageTitle ? ` · ${c.currentStageTitle}` : ""}
                         </p>
                       </div>
-                      <ChevronRight className="size-5 shrink-0 text-neutral/35" />
+                      <ChevronRight className="size-5 shrink-0 text-muted-foreground" />
                     </Link>
                   </li>
                 ))}

@@ -1,84 +1,51 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronRight, MapPin, Scale, User } from "lucide-react";
+import { Scale, User } from "lucide-react";
 import type { LawyerSearchResult } from "@/lib/lawyers";
-import { lawyerBadge } from "@/lib/lawyers";
-import { cn } from "@/lib/utils";
 
 type LawyerSearchResultCardProps = {
   lawyer: LawyerSearchResult;
   onSelect: () => void;
 };
 
-function formatExperienceShort(years: number | null): string {
-  if (years == null) return "Experience not listed";
-  return `${years}+ years experience`;
-}
-
 export function LawyerSearchResultCard({
   lawyer,
   onSelect,
 }: LawyerSearchResultCardProps) {
-  const badge = lawyerBadge(lawyer.experienceYears);
-  const location = lawyer.officeAddress
-    ? `${lawyer.province} · ${lawyer.officeAddress}`
-    : lawyer.province;
-
   return (
     <button
       type="button"
       onClick={onSelect}
-      className="group flex w-full items-center gap-4 rounded-2xl border border-black/5 bg-white p-4 text-left shadow-sm transition hover:border-primary/25 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 sm:gap-5 sm:p-5"
+      className="dashboard-card-interactive group flex h-full w-full min-w-0 flex-col overflow-hidden p-3 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
     >
       {lawyer.profilePhotoUrl ? (
-        <div className="relative size-14 shrink-0 overflow-hidden rounded-xl border border-black/5 sm:size-16">
+        <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-lg ring-1 ring-[var(--gold,#f5b73c)]/35">
           <Image
             src={lawyer.profilePhotoUrl}
             alt=""
             fill
             className="object-cover"
-            sizes="64px"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         </div>
       ) : (
-        <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-black/5 bg-tertiary text-secondary/70 sm:size-16">
-          <User className="size-7 sm:size-8" strokeWidth={1.5} aria-hidden />
+        <div className="flex aspect-square w-full shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--gold,#f5b73c)]/15 text-[var(--gold,#f5b73c)] ring-1 ring-[var(--gold,#f5b73c)]/35">
+          <User className="size-14 sm:size-16" strokeWidth={1.25} aria-hidden />
         </div>
       )}
 
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-serif text-lg font-medium text-secondary transition group-hover:text-secondary/90">
-            {lawyer.fullName}
-          </h3>
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 text-[9px] font-semibold tracking-wider uppercase",
-              badge.className,
-            )}
-          >
-            {badge.label}
-          </span>
-        </div>
-
-        <p className="mt-1 flex items-center gap-1.5 text-sm text-primary">
-          <Scale className="size-3.5 shrink-0 opacity-70" aria-hidden />
+      <div className="mt-3 flex min-w-0 w-full flex-col items-center overflow-hidden">
+        <h3 className="w-full truncate text-sm font-semibold tracking-tight text-foreground">
+          {lawyer.fullName}
+        </h3>
+        <p className="mt-1.5 flex max-w-full items-center justify-center gap-1.5 text-xs text-muted-foreground">
+          <Scale
+            className="size-3.5 shrink-0 text-[var(--gold,#f5b73c)]/80"
+            aria-hidden
+          />
           <span className="truncate">{lawyer.specialization}</span>
         </p>
-
-        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral/60">
-          <span>{formatExperienceShort(lawyer.experienceYears)}</span>
-          <span className="flex min-w-0 items-center gap-1">
-            <MapPin className="size-3 shrink-0" aria-hidden />
-            <span className="truncate">{location}</span>
-          </span>
-        </div>
-      </div>
-
-      <div className="flex shrink-0 flex-col items-end gap-1 text-primary/70 transition group-hover:text-primary">
-        <span className="hidden text-xs font-medium sm:inline">View profile</span>
-        <ChevronRight className="size-5" aria-hidden />
       </div>
     </button>
   );

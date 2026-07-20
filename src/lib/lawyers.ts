@@ -224,17 +224,17 @@ export function lawyerBadge(experienceYears: number | null): {
   if (years >= 15) {
     return {
       label: "ELITE PARTNER",
-      className: "bg-primary/20 text-secondary",
+      className: "bg-[var(--gold,#f5b73c)]/20 text-[var(--gold,#f5b73c)]",
     };
   }
   if (years >= 8) {
     return {
       label: "TOP RATED",
-      className: "bg-emerald-100 text-emerald-800",
+      className: "bg-emerald-500/15 text-emerald-300",
     };
   }
   return {
     label: "SPECIALIST",
-    className: "bg-sky-100 text-sky-800",
+    className: "bg-sky-500/15 text-sky-300",
   };
 }

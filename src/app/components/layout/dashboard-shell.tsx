@@ -2,7 +2,6 @@
 
 import { useState, type ReactNode } from "react";
 import type { SessionPayload } from "@/lib/session";
-import { Navbar } from "@/app/components/layout/navbar";
 import {
   Sidebar,
   type SidebarNavLabel,
@@ -12,7 +11,7 @@ type DashboardShellProps = {
   session: SessionPayload;
   activeItem?: SidebarNavLabel;
   showSupport?: boolean;
-  /** Navbar text for /dashboard/tickets link */
+  /** Kept for call-site compatibility; top bar was removed */
   ticketsLinkLabel?: string;
   children: ReactNode;
 };
@@ -20,29 +19,20 @@ type DashboardShellProps = {
 export function DashboardShell({
   session,
   activeItem = "Home",
-  showSupport = true,
-  ticketsLinkLabel,
   children,
 }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-tertiary">
+    <div className="flex h-screen overflow-hidden bg-[#16100c]">
       <Sidebar
         role={session.role === "client" ? "client" : "lawyer"}
         activeItem={activeItem}
         collapsed={collapsed}
         onToggle={() => setCollapsed((prev) => !prev)}
       />
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <Navbar
-          email={session.email}
-          showSupport={showSupport}
-          ticketsLinkLabel={ticketsLinkLabel}
-        />
-        <div className="dashboard-grid-bg min-h-0 flex-1 overflow-y-auto">
-          {children}
-        </div>
+      <div className="dashboard-grid-bg min-h-0 min-w-0 flex-1 overflow-y-auto">
+        {children}
       </div>
     </div>
   );

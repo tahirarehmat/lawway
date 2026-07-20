@@ -60,7 +60,7 @@ export function LawyerSearchSelect({
     <div ref={containerRef} className="relative">
       {icon ? (
         <span
-          className="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-neutral/40"
+          className="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2 text-muted-foreground"
           aria-hidden
         >
           {icon}
@@ -76,15 +76,15 @@ export function LawyerSearchSelect({
         aria-label={ariaLabel}
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "flex w-full items-center justify-between rounded-lg border border-black/10 bg-[#faf9f7] py-2.5 text-left text-sm text-secondary outline-none transition",
-          icon ? "pr-9 pl-9" : "px-4 pr-9",
-          open && "border-primary/50 ring-1 ring-primary/30",
+          "flex w-full items-center justify-between rounded-xl border border-border bg-card py-2.5 text-left text-sm text-foreground outline-none transition",
+          icon ? "pr-9 pl-9" : "px-3.5 pr-9",
+          open && "border-primary ring-2 ring-ring/30",
         )}
       >
         <span className="truncate">{selected?.label ?? "Select…"}</span>
         <ChevronDown
           className={cn(
-            "pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-neutral/45 transition-transform",
+            "pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground transition-transform",
             open && "rotate-180",
           )}
           aria-hidden
@@ -96,7 +96,7 @@ export function LawyerSearchSelect({
           id={listboxId}
           role="listbox"
           aria-labelledby={id}
-          className="scrollbar-hidden absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-black/10 bg-white py-1 shadow-lg"
+          className="scrollbar-hidden absolute z-50 mt-1 max-h-52 w-full overflow-y-auto rounded-xl border border-border bg-card py-1 shadow-[0_12px_32px_rgba(28,25,23,0.08)]"
         >
           {options.map((option) => {
             const isSelected = option.value === value;
@@ -114,8 +114,8 @@ export function LawyerSearchSelect({
                   className={cn(
                     "w-full px-3 py-2.5 text-left text-sm transition",
                     isSelected
-                      ? "bg-primary/15 font-medium text-secondary"
-                      : "text-neutral/80 hover:bg-tertiary hover:text-secondary",
+                      ? "bg-primary/15 font-medium text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
                   {option.label}

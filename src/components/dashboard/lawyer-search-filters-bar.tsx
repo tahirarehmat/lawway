@@ -41,7 +41,7 @@ function FilterField({
     <div className="min-w-0 flex-1">
       <label
         htmlFor={id}
-        className="mb-1.5 block text-[11px] font-medium tracking-wide text-neutral/50 uppercase"
+        className="mb-1.5 block text-[11px] font-medium tracking-wide text-muted-foreground uppercase"
       >
         {label}
       </label>
@@ -70,13 +70,13 @@ export function LawyerSearchFiltersBar({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-black/5 bg-white p-4 shadow-sm sm:p-5",
+        "rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6",
         className,
       )}
     >
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-secondary">
-          <SlidersHorizontal className="size-4 text-primary" aria-hidden />
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-foreground">
+          <SlidersHorizontal className="size-4 text-muted-foreground" aria-hidden />
           <span className="text-sm font-medium">Filters</span>
         </div>
         {hasActiveFilters ? (

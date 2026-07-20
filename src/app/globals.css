@@ -11,6 +11,23 @@
   --tertiary: #f9f7f2;
   --neutral: #2c2c2c;
 
+  /* Neutral scale (warm-tinted grays) — used by dashboard redesign */
+  --ink: #1c1917;
+  --ink-soft: #57534e;
+  --ink-muted: #78716c;
+  --ink-subtle: #a8a29e;
+  --line: #ececea;
+  --line-strong: #e0dfdc;
+  --canvas: #fafaf9;
+  --surface: #ffffff;
+  --surface-muted: #f6f5f3;
+
+  /* Elevation — soft, diffuse shadows (no hard borders) */
+  --shadow-xs: 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-sm: 0 1px 3px rgba(28, 25, 23, 0.06), 0 1px 2px rgba(28, 25, 23, 0.04);
+  --shadow-md: 0 4px 16px rgba(28, 25, 23, 0.06);
+  --shadow-lg: 0 12px 32px rgba(28, 25, 23, 0.08);
+
   /* Sign-in screen */
   --signin-page-bg: #1a0f0e;
   --signin-card-bg: #241816;
@@ -23,67 +40,63 @@
   --scrollbar-thumb: #523d39;
   --scrollbar-thumb-hover: #d4af37;
 
-  /* Dashboard pattern — soft cream grid */
-  --dashboard-pattern-base: #fcf9f6;
-  --dashboard-pattern-line: color-mix(
-    in srgb,
-    var(--secondary) 7%,
-    color-mix(in srgb, var(--primary) 4%, transparent)
-  );
+  /* Dashboard canvas — flat, no grid */
+  --dashboard-pattern-base: #fafaf9;
+  --dashboard-pattern-line: transparent;
 
   /* Dashboard surfaces */
-  --dashboard-surface: #fffcf8;
-  --dashboard-surface-muted: #f6f1ea;
-  --dashboard-border: color-mix(in srgb, var(--secondary) 9%, transparent);
-  --dashboard-border-hover: color-mix(in srgb, var(--primary) 38%, transparent);
-  --dashboard-shadow: 0 1px 2px color-mix(in srgb, var(--secondary) 5%, transparent);
-  --dashboard-shadow-hover: 0 6px 20px color-mix(in srgb, var(--secondary) 7%, transparent);
+  --dashboard-surface: #ffffff;
+  --dashboard-surface-muted: #f6f5f3;
+  --dashboard-border: var(--line);
+  --dashboard-border-hover: var(--line-strong);
+  --dashboard-shadow: var(--shadow-sm);
+  --dashboard-shadow-hover: var(--shadow-md);
 
-  /* Home — balanced brown/gold */
-  --home-card-surface: #fffefb;
-  --home-card-soft: color-mix(in srgb, var(--secondary) 4%, white);
-  --home-card-accent: color-mix(in srgb, var(--primary) 13%, var(--dashboard-pattern-base));
-  --home-text: var(--secondary);
-  --home-text-muted: color-mix(in srgb, var(--secondary) 52%, transparent);
-  --home-text-subtle: color-mix(in srgb, var(--secondary) 40%, transparent);
-  --home-border-soft: color-mix(in srgb, var(--secondary) 11%, transparent);
-  --home-border-gold: color-mix(in srgb, var(--primary) 28%, transparent);
-  --home-shadow-soft: 0 2px 14px color-mix(in srgb, var(--secondary) 6%, transparent);
-  --home-shadow-hover: 0 8px 24px color-mix(in srgb, var(--secondary) 9%, transparent);
+  /* Home surfaces — light, minimal */
+  --home-card-surface: #ffffff;
+  --home-card-soft: var(--surface-muted);
+  --home-card-accent: color-mix(in srgb, var(--primary) 8%, white);
+  --home-text: var(--ink);
+  --home-text-muted: var(--ink-muted);
+  --home-text-subtle: var(--ink-subtle);
+  --home-border-soft: var(--line);
+  --home-border-gold: color-mix(in srgb, var(--primary) 40%, transparent);
+  --home-shadow-soft: var(--shadow-sm);
+  --home-shadow-hover: var(--shadow-md);
 
   /* Semantic aliases */
 
-  --background: oklch(1 0 0);
+  --background: #fafaf9;
 
-  --foreground: oklch(0.145 0 0);
+  --foreground: #1c1917;
 
-  --card: oklch(1 0 0);
+  --card: #ffffff;
 
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #1c1917;
 
-  --popover: oklch(1 0 0);
+  --popover: #ffffff;
 
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: #1c1917;
 
   --primary-foreground: #3e2723;
 
   --secondary-foreground: #f9f7f2;
 
-  --muted: oklch(0.97 0 0);
+  --muted: #f6f5f3;
 
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: #78716c;
 
-  --accent: oklch(0.97 0 0);
+  --accent: #f6f5f3;
 
-  --accent-foreground: oklch(0.205 0 0);
+  --accent-foreground: #1c1917;
 
   --destructive: oklch(0.577 0.245 27.325);
 
-  --border: oklch(0.922 0 0);
+  --border: #ececea;
 
-  --input: oklch(0.922 0 0);
+  --input: #ececea;
 
-  --ring: oklch(0.708 0 0);
+  --ring: #d4af37;
 
   --chart-1: oklch(0.87 0 0);
 
@@ -95,23 +108,23 @@
 
   --chart-5: oklch(0.269 0 0);
 
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: #ffffff;
 
-  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-foreground: #1c1917;
 
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: #d4af37;
 
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary-foreground: #2a1a12;
 
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: #f6f5f3;
 
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent-foreground: #1c1917;
 
-  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-border: #ececea;
 
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: #d4af37;
 }
 
 @theme inline {
@@ -204,92 +217,133 @@ body {
   display: none;
 }
 
-/* Dashboard main area: light cream with a very soft grid */
+/* Dashboard theme — near-black / amber / brown across every tab.
+   Semantic tokens are scoped here so text-foreground / muted / card /
+   dashboard-card utilities all match the home tab automatically. */
 .dashboard-grid-bg {
-  background-color: var(--dashboard-pattern-base);
-  background-image:
-    linear-gradient(
-      to right,
-      var(--dashboard-pattern-line) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      var(--dashboard-pattern-line) 1px,
-      transparent 1px
-    );
-  background-size: 56px 56px;
+  --home-radius: 1.1rem;
+  --home-inset: 1.5rem;
+  --home-inset-lg: 1.75rem;
+
+  --background: #100b09;
+  --foreground: #f7f4ee;
+  --card-foreground: #f7f4ee;
+  --popover: #1b1512;
+  --popover-foreground: #f7f4ee;
+  --muted-foreground: rgba(247, 244, 238, 0.64);
+  --border: rgba(247, 244, 238, 0.08);
+  --input: rgba(247, 244, 238, 0.1);
+  --muted: rgba(247, 244, 238, 0.06);
+  --accent: rgba(247, 244, 238, 0.06);
+  --accent-foreground: #f7f4ee;
+  --card: #1b1512;
+
+  --canvas: #100b09;
+  --surface: #1b1512;
+  --surface-muted: rgba(247, 244, 238, 0.06);
+  --ink: #f7f4ee;
+  --ink-soft: rgba(247, 244, 238, 0.72);
+  --ink-muted: rgba(247, 244, 238, 0.64);
+  --ink-subtle: rgba(247, 244, 238, 0.4);
+  --line: rgba(247, 244, 238, 0.08);
+  --line-strong: rgba(247, 244, 238, 0.14);
+
+  --dashboard-surface: #1b1512;
+  --dashboard-surface-muted: rgba(247, 244, 238, 0.05);
+  --dashboard-border: rgba(247, 244, 238, 0.08);
+  --dashboard-border-hover: rgba(245, 158, 11, 0.35);
+  --dashboard-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+  --dashboard-shadow-hover: 0 22px 46px -28px rgba(0, 0, 0, 0.95);
+
+  --home-text: #f7f4ee;
+  --home-text-muted: rgba(247, 244, 238, 0.64);
+  --home-text-subtle: rgba(247, 244, 238, 0.4);
+  --gold: #f5b73c;
+  --gold-strong: #f59e0b;
+
+  color: var(--home-text);
+  background:
+    radial-gradient(115% 75% at 50% -12%, rgba(245, 158, 11, 0.12), transparent 55%),
+    radial-gradient(90% 60% at 100% 0%, rgba(120, 72, 30, 0.16), transparent 60%),
+    linear-gradient(180deg, #16100c 0%, #100b09 55%, #0a0706 100%);
 }
 
 .dashboard-card {
-  border-radius: 1rem;
-  border: 1px solid var(--dashboard-border);
-  background: var(--dashboard-surface);
-  box-shadow: var(--dashboard-shadow);
+  border-radius: var(--home-radius, 0.875rem);
+  border: none;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(158deg, #241811 0%, #17100d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 50px -30px rgba(0, 0, 0, 0.95);
 }
 
 .dashboard-card-muted {
-  border-radius: 1rem;
-  border: 1px solid var(--dashboard-border);
-  background: var(--dashboard-surface-muted);
-  box-shadow: var(--dashboard-shadow);
+  border-radius: 0.875rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .dashboard-card-interactive {
-  border-radius: 1rem;
-  border: 1px solid var(--dashboard-border);
-  background: var(--dashboard-surface);
-  box-shadow: var(--dashboard-shadow);
+  border-radius: var(--home-radius, 0.875rem);
+  border: none;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(158deg, #241811 0%, #17100d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 50px -30px rgba(0, 0, 0, 0.95);
   transition:
-    border-color 0.2s ease,
     box-shadow 0.2s ease,
-    background-color 0.2s ease;
+    transform 0.2s ease;
 }
 
 .dashboard-card-interactive:hover {
-  border-color: var(--dashboard-border-hover);
-  box-shadow: var(--dashboard-shadow-hover);
-  background: color-mix(in srgb, var(--dashboard-surface) 88%, var(--primary) 12%);
+  box-shadow:
+    inset 0 0 0 1px rgba(245, 158, 11, 0.35),
+    0 22px 46px -28px rgba(0, 0, 0, 0.95);
+  transform: translateY(-1px);
 }
 
 .dashboard-pill {
   display: inline-flex;
   align-items: center;
   border-radius: 9999px;
-  padding: 0.125rem 0.625rem;
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--secondary);
-  background: color-mix(in srgb, var(--primary) 16%, var(--dashboard-pattern-base));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 22%, transparent);
+  padding: 0.1875rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--home-text-muted, var(--ink-soft));
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .dashboard-icon-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.75rem;
-  background: color-mix(in srgb, var(--primary) 14%, var(--dashboard-pattern-base));
-  color: color-mix(in srgb, var(--secondary) 88%, var(--primary));
+  border-radius: 0.625rem;
+  background: rgba(245, 158, 11, 0.14);
+  color: var(--gold, #f5b73c);
 }
 
-/* Client home — dark outer shells (sidebar), inset light inner cards */
+/* Home layout helpers — inherit dark tokens from .dashboard-grid-bg */
 .dashboard-home {
-  --home-radius: 1.25rem;
-  --home-inset: 1.25rem;
-  --home-inset-lg: 1.5rem;
-  --home-outer-bg: var(--secondary);
-  --home-outer-border: color-mix(in srgb, var(--primary) 22%, transparent);
-  --home-cream: #fcf9f6;
+  min-height: 100%;
+  color: var(--home-text);
 }
 
+/* Borderless panels — gradient fill + soft elevation instead of an outline */
 .dashboard-home .home-outer {
+  position: relative;
   border-radius: var(--home-radius);
-  border: 1px solid var(--home-outer-border);
-  background: var(--home-outer-bg);
-  box-shadow: 0 10px 36px color-mix(in srgb, var(--secondary) 45%, transparent);
+  border: none;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(158deg, #241811 0%, #17100d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 50px -30px rgba(0, 0, 0, 0.95);
 }
 
 .dashboard-home .home-outer-header {
@@ -297,26 +351,26 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 1rem var(--home-inset-lg);
-  border-bottom: 1px solid color-mix(in srgb, white 10%, transparent);
+  padding: 1.25rem var(--home-inset-lg);
+  border-bottom: 1px solid rgba(247, 244, 238, 0.06);
 }
 
 .dashboard-home .home-outer-title {
-  font-family: var(--font-headline), serif;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--home-text);
 }
 
 .dashboard-home .home-outer-link {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: color-mix(in srgb, var(--home-cream) 72%, transparent);
+  color: var(--home-text-muted);
   transition: color 0.2s ease;
 }
 
 .dashboard-home .home-outer-link:hover {
-  color: var(--primary);
+  color: var(--gold);
 }
 
 .dashboard-home .home-outer-body {
@@ -328,48 +382,67 @@ body {
 }
 
 .dashboard-home .home-inner {
-  border-radius: calc(var(--home-radius) - 0.2rem);
-  border: 1px solid var(--home-border-soft);
-  background: var(--home-card-surface);
-  box-shadow: 0 2px 10px color-mix(in srgb, black 6%, transparent);
+  border-radius: 0.85rem;
+  border: none;
+  background:
+    linear-gradient(158deg, #211610 0%, #17100d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 40px -30px rgba(0, 0, 0, 0.9);
+}
+
+/* Standalone hero card (welcome block) — rich brown with a soft amber wash */
+.dashboard-home .home-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--home-radius);
+  border: none;
+  background:
+    radial-gradient(120% 130% at 100% 0%, rgba(245, 158, 11, 0.14), transparent 52%),
+    linear-gradient(158deg, #271a12 0%, #17100d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 50px -30px rgba(0, 0, 0, 0.95);
 }
 
 .dashboard-home .home-inner-featured {
-  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
   background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--primary) 18%, white) 0%,
-      var(--home-card-accent) 45%,
-      var(--home-card-surface) 100%
-    );
+    radial-gradient(130% 130% at 100% 0%, rgba(245, 158, 11, 0.32), transparent 52%),
+    linear-gradient(160deg, rgba(245, 158, 11, 0.14), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 22px 48px -26px rgba(245, 158, 11, 0.45);
 }
 
 .dashboard-home .home-inner-interactive {
-  border-radius: calc(var(--home-radius) - 0.2rem);
-  border: 1px solid var(--home-border-soft);
-  background: var(--home-card-surface);
-  box-shadow: 0 2px 10px color-mix(in srgb, black 6%, transparent);
+  border-radius: 0.85rem;
+  border: none;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.012)
+  );
   transition:
-    border-color 0.2s ease,
     box-shadow 0.2s ease,
-    background-color 0.2s ease,
     transform 0.2s ease;
 }
 
 .dashboard-home .home-inner-interactive:hover {
-  border-color: var(--home-border-gold);
-  box-shadow: var(--home-shadow-hover);
-  background: var(--home-card-soft);
+  box-shadow:
+    inset 0 0 0 1px rgba(245, 158, 11, 0.35),
+    0 20px 42px -26px rgba(0, 0, 0, 0.95);
+  transform: translateY(-2px);
 }
 
 .dashboard-home .home-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.875rem;
-  background: color-mix(in srgb, var(--primary) 22%, white);
-  color: var(--home-text);
+  border-radius: 0.7rem;
+  background: linear-gradient(
+    160deg,
+    rgba(245, 158, 11, 0.28),
+    rgba(245, 158, 11, 0.08)
+  );
+  color: var(--gold);
 }
 
 .dashboard-home .home-pill {
@@ -377,12 +450,11 @@ body {
   align-items: center;
   border-radius: 9999px;
   padding: 0.2rem 0.65rem;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: var(--primary);
-  color: var(--secondary);
+  letter-spacing: 0.02em;
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--gold);
 }
 
 .dashboard-home .home-muted {
@@ -394,15 +466,15 @@ body {
 }
 
 .dashboard-home .home-accent {
-  color: color-mix(in srgb, var(--secondary) 30%, var(--primary));
+  color: var(--gold);
   font-weight: 600;
 }
 
 .dashboard-home .home-stat-value {
-  font-family: var(--font-headline), serif;
-  font-size: 1.75rem;
-  font-weight: 500;
-  line-height: 1.2;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   color: var(--home-text);
 }
 
@@ -411,20 +483,70 @@ body {
   align-items: center;
   gap: 0.375rem;
   border-radius: 9999px;
-  border: 1px solid var(--home-border-soft);
-  background: color-mix(in srgb, var(--primary) 8%, white);
-  padding: 0.375rem 0.75rem;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.8rem;
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--home-text-muted);
   transition:
-    border-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .dashboard-home .home-chip:hover {
-  border-color: var(--home-border-gold);
+  background: rgba(245, 158, 11, 0.12);
   color: var(--home-text);
+}
+
+/* Colored stat card — borderless; accent wash covers the full card */
+.dashboard-home .stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.95rem;
+  border: none;
+  background:
+    radial-gradient(
+      120% 120% at 50% 40%,
+      var(--accent-soft, transparent),
+      transparent 72%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--accent, #f5b73c) 14%, #241811) 0%,
+      color-mix(in srgb, var(--accent, #f5b73c) 6%, #1a1210) 48%,
+      #140e0b 100%
+    );
+  padding: 1.2rem 1.25rem;
+  box-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.dashboard-home .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent, #f5b73c) 35%, transparent),
+    0 22px 46px -28px rgba(0, 0, 0, 0.95);
+}
+
+.dashboard-home .stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--accent, #f5b73c);
+}
+
+/* Chart legend swatch */
+.dashboard-home .legend-dot {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: var(--dot, #f5b73c);
 }
 
 .dark {

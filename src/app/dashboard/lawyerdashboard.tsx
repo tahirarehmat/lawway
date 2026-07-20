@@ -22,6 +22,14 @@ import {
 import { fetchCaseDetail, fetchCases } from "@/lib/cases-api";
 import { DashboardShell } from "@/app/components/layout/dashboard-shell";
 import { CaseProgressTimeline } from "@/components/dashboard/case-progress-timeline";
+import {
+  ACCENTS,
+  BarList,
+  DonutChart,
+  Sparkline,
+  StatCard,
+  type ChartDatum,
+} from "@/components/dashboard/dashboard-charts";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -29,6 +37,26 @@ import { toast } from "sonner";
 type LawyerDashboardProps = {
   session: SessionPayload;
 };
+
+const CASE_STATUS_META: Record<string, { label: string; color: string }> = {
+  active: { label: "Active", color: ACCENTS.emerald.base },
+  on_hold: { label: "On hold", color: ACCENTS.amber.base },
+  closed: { label: "Closed", color: ACCENTS.violet.base },
+};
+
+const DEMO_CASE_STATUS: ChartDatum[] = [
+  { label: "Active", value: 5, color: ACCENTS.emerald.base },
+  { label: "On hold", value: 2, color: ACCENTS.amber.base },
+  { label: "Closed", value: 4, color: ACCENTS.violet.base },
+];
+
+const DEMO_PIPELINE: ChartDatum[] = [
+  { label: "Pending requests", value: 3, color: ACCENTS.amber.base },
+  { label: "Active cases", value: 5, color: ACCENTS.emerald.base },
+  { label: "Hearings", value: 2, color: ACCENTS.sky.base },
+];
+
+const DEMO_REQUESTS_TREND = [1, 0, 2, 1, 3, 0, 2];
 
 function greetingName(email: string): string {
   const local = email.split("@")[0] ?? "counselor";
@@ -56,11 +84,11 @@ function formatRequestMeta(createdAt: string): string {
 function statusClass(status: CaseListItem["status"]): string {
   switch (status) {
     case "active":
-      return "bg-primary/20 text-secondary";
+      return "bg-primary/15 text-foreground";
     case "on_hold":
-      return "bg-neutral/10 text-neutral/60";
+      return "bg-muted text-muted-foreground";
     default:
-      return "bg-neutral/10 text-neutral/60";
+      return "bg-muted text-muted-foreground";
   }
 }
 
@@ -148,39 +176,73 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
       label: "Pending requests",
       value: loading ? "…" : String(requests.length),
       icon: Gavel,
+      accent: "amber" as const,
     },
     {
       label: "Active cases",
       value: loading ? "…" : String(activeCases.length),
       icon: Briefcase,
+      accent: "emerald" as const,
     },
     {
       label: "Hearings",
       value: loading ? "…" : String(hearings.length),
       icon: CalendarDays,
+      accent: "sky" as const,
     },
-  ] as const;
+  ];
+
+  const caseStatusData: ChartDatum[] = Object.entries(
+    cases.reduce<Record<string, number>>((acc, c) => {
+      acc[c.status] = (acc[c.status] ?? 0) + 1;
+      return acc;
+    }, {}),
+  ).map(([status, value]) => ({
+    label: CASE_STATUS_META[status]?.label ?? status.replace("_", " "),
+    value,
+    color: CASE_STATUS_META[status]?.color ?? ACCENTS.gold.base,
+  }));
+
+  const pipelineData: ChartDatum[] = [
+    { label: "Pending requests", value: requests.length, color: ACCENTS.amber.base },
+    { label: "Active cases", value: activeCases.length, color: ACCENTS.emerald.base },
+    { label: "Hearings", value: hearings.length, color: ACCENTS.sky.base },
+  ];
+
+  const requestsTrend = (() => {
+    const days = 7;
+    const counts = new Array(days).fill(0);
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (days - 1));
+    requests.forEach((r) => {
+      const d = new Date(r.createdAt);
+      d.setHours(0, 0, 0, 0);
+      const idx = Math.round((d.getTime() - start.getTime()) / 86400000);
+      if (idx >= 0 && idx < days) counts[idx] += 1;
+    });
+    return counts as number[];
+  })();
+
+  const caseloadData =
+    caseStatusData.length >= 2 ? caseStatusData : DEMO_CASE_STATUS;
+  const caseloadTotal = caseloadData.reduce((sum, d) => sum + d.value, 0);
+  const pipelineChartData =
+    pipelineData.some((d) => d.value > 0) ? pipelineData : DEMO_PIPELINE;
+  const trendData =
+    requestsTrend.some((n) => n > 0) ? requestsTrend : DEMO_REQUESTS_TREND;
 
   return (
     <DashboardShell session={session} activeItem="Home" showSupport={false}>
       <div className="dashboard-home mx-auto max-w-6xl px-4 py-8 sm:px-8 sm:py-10">
-        <header className="mb-6">
-          <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
-            Advocate dashboard
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-secondary sm:text-4xl">
-            Home
-          </h1>
-        </header>
-
-        <section className="home-outer mb-6" aria-label="Overview">
-          <div className="home-outer-body">
+        <section className="mb-6" aria-label="Overview">
+          <div>
             <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
-              <div className="home-inner flex flex-1 flex-col justify-center p-5 sm:p-6 lg:p-7">
+              <div className="home-hero flex flex-1 flex-col justify-center p-6 sm:p-7 lg:p-8">
                 <p className="home-subtle text-[11px] font-medium tracking-[0.18em] uppercase">
                   {formatToday()}
                 </p>
-                <h2 className="mt-3 font-serif text-2xl font-medium tracking-tight text-secondary sm:text-3xl">
+                <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                   Welcome, {firstName}
                 </h2>
                 <p className="home-muted mt-3 text-sm leading-relaxed sm:text-base">
@@ -197,7 +259,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                     href="/dashboard/requests"
                     className={cn(
                       buttonVariants({ variant: "default", size: "default" }),
-                      "inline-flex bg-primary text-secondary hover:bg-primary/90",
+                      "inline-flex",
                     )}
                   >
                     <Gavel className="size-4" aria-hidden />
@@ -207,7 +269,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                     href="/dashboard/cases"
                     className={cn(
                       buttonVariants({ variant: "outline", size: "default" }),
-                      "inline-flex border-[color-mix(in_srgb,var(--secondary)_18%,transparent)] text-secondary hover:bg-[color-mix(in_srgb,var(--primary)_10%,white)]",
+                      "inline-flex",
                     )}
                   >
                     Active cases
@@ -237,7 +299,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                             .toUpperCase()
                         : "TBD"}
                     </p>
-                    <p className="mt-2 font-serif text-xl font-medium text-secondary line-clamp-2">
+                    <p className="mt-2 text-xl font-semibold tracking-tight text-foreground line-clamp-2">
                       {nextHearing.title}
                     </p>
                     <p className="home-muted mt-2 text-sm">{nextHearing.caseTitle}</p>
@@ -257,17 +319,15 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
               )}
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {overviewStats.map((stat) => (
-                <div key={stat.label} className="home-inner p-4 sm:p-5">
-                  <div className="home-muted flex items-center gap-1.5">
-                    <stat.icon className="size-3.5 shrink-0 text-primary" aria-hidden />
-                    <span className="truncate text-[10px] font-medium tracking-wide uppercase sm:text-[11px]">
-                      {stat.label}
-                    </span>
-                  </div>
-                  <p className="home-stat-value mt-2">{stat.value}</p>
-                </div>
+                <StatCard
+                  key={stat.label}
+                  label={stat.label}
+                  value={stat.value}
+                  icon={stat.icon}
+                  accent={stat.accent}
+                />
               ))}
             </div>
           </div>
@@ -276,7 +336,61 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
         {loading ? (
           <p className="home-muted text-sm">Loading dashboard…</p>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-12">
+          <>
+            <div className="mb-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <section className="home-outer" aria-labelledby="case-mix-heading">
+                <div className="home-outer-header">
+                  <h2 id="case-mix-heading" className="home-outer-title">
+                    Caseload
+                  </h2>
+                  <span className="home-subtle text-xs">By status</span>
+                </div>
+                <div className="home-outer-body">
+                  <DonutChart
+                    data={caseloadData}
+                    centerValue={String(caseloadTotal)}
+                    centerLabel="Cases"
+                  />
+                </div>
+              </section>
+
+              <section className="home-outer" aria-labelledby="pipeline-heading">
+                <div className="home-outer-header">
+                  <h2 id="pipeline-heading" className="home-outer-title">
+                    Practice pipeline
+                  </h2>
+                  <span className="home-subtle text-xs">Current</span>
+                </div>
+                <div className="home-outer-body">
+                  <BarList data={pipelineChartData} />
+                </div>
+              </section>
+
+              <section
+                className="home-outer md:col-span-2 xl:col-span-1"
+                aria-labelledby="trend-heading"
+              >
+                <div className="home-outer-header">
+                  <h2 id="trend-heading" className="home-outer-title">
+                    New requests
+                  </h2>
+                  <span className="home-subtle text-xs">Last 7 days</span>
+                </div>
+                <div className="home-outer-body">
+                  <div className="flex items-baseline gap-2">
+                    <span className="home-stat-value">{requests.length}</span>
+                    <span className="home-muted text-sm">pending</span>
+                  </div>
+                  <Sparkline
+                    points={trendData}
+                    color={ACCENTS.rose.base}
+                    className="mt-3"
+                  />
+                </div>
+              </section>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-12">
             <div className="space-y-6 lg:col-span-7 xl:col-span-8">
               <section className="home-outer" aria-labelledby="case-requests-heading">
                 <div className="home-outer-header">
@@ -285,7 +399,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                   </h2>
                   <div className="flex items-center gap-2">
                     {requests.length > 0 ? (
-                      <span className="rounded bg-rose-500/90 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
+                      <span className="rounded-full bg-red-500/15 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-red-300 uppercase">
                         Action needed
                       </span>
                     ) : null}
@@ -305,7 +419,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                       <span className="home-icon mx-auto size-12">
                         <Gavel className="size-5" aria-hidden />
                       </span>
-                      <p className="mt-4 text-sm font-medium text-secondary">
+                      <p className="mt-4 text-sm font-medium text-foreground">
                         No pending requests
                       </p>
                       <p className="home-muted mt-1 text-xs">
@@ -322,7 +436,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                                 <Gavel className="size-4" aria-hidden />
                               </span>
                               <div className="min-w-0">
-                                <p className="font-medium text-secondary">{request.title}</p>
+                                <p className="font-medium text-foreground">{request.title}</p>
                                 <p className="home-muted mt-0.5 text-sm">
                                   {request.clientName} · {formatRequestMeta(request.createdAt)}
                                 </p>
@@ -336,7 +450,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                             </div>
                             <div className="flex shrink-0 gap-2">
                               <Button
-                                className="h-9 bg-primary px-5 text-secondary hover:bg-primary/90"
+                                className="h-9 px-5"
                                 disabled={actionId != null}
                                 onClick={() => void handleAccept(request.requestId)}
                               >
@@ -344,7 +458,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                               </Button>
                               <Button
                                 variant="outline"
-                                className="h-9 border-[color-mix(in_srgb,var(--secondary)_18%,transparent)] text-secondary hover:bg-[color-mix(in_srgb,var(--primary)_10%,white)]"
+                                className="h-9"
                                 disabled={actionId != null}
                                 onClick={() => void handleDecline(request.requestId)}
                               >
@@ -379,7 +493,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                       <span className="home-icon mx-auto size-12">
                         <Briefcase className="size-5" aria-hidden />
                       </span>
-                      <p className="mt-4 text-sm font-medium text-secondary">
+                      <p className="mt-4 text-sm font-medium text-foreground">
                         No active cases yet
                       </p>
                       <p className="home-muted mt-1 text-xs">
@@ -387,48 +501,33 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                       </p>
                     </div>
                   ) : (
-                    <div className="home-inner overflow-x-auto">
-                      <table className="w-full min-w-[520px] text-left text-sm">
-                        <thead>
-                          <tr className="border-b border-[var(--home-border-soft)] text-[11px] tracking-wide text-neutral/50 uppercase">
-                            <th className="px-4 pb-3 pt-4 font-medium">Case</th>
-                            <th className="pb-3 font-medium">Client</th>
-                            <th className="pb-3 font-medium">Milestone</th>
-                            <th className="pr-4 pb-3 font-medium">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {activeCases.map((caseItem) => (
-                            <tr
-                              key={caseItem.caseId}
-                              className="border-b border-[var(--home-border-soft)] last:border-0"
-                            >
-                              <td className="px-4 py-4 font-medium text-secondary">
-                                <Link
-                                  href={`/dashboard/cases/${caseItem.caseId}`}
-                                  className="hover:text-primary"
-                                >
-                                  {caseItem.title}
-                                </Link>
-                              </td>
-                              <td className="py-4 text-neutral/80">{caseItem.clientName}</td>
-                              <td className="py-4 text-neutral/80">
-                                {caseItem.currentStageTitle ?? "—"}
-                              </td>
-                              <td className="pr-4 py-4">
-                                <span
-                                  className={cn(
-                                    "rounded px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
-                                    statusClass(caseItem.status),
-                                  )}
-                                >
-                                  {caseItem.status.replace("_", " ")}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                    <div className="home-inner divide-y divide-border overflow-hidden">
+                      {activeCases.map((caseItem) => (
+                        <Link
+                          key={caseItem.caseId}
+                          href={`/dashboard/cases/${caseItem.caseId}`}
+                          className="group flex items-center justify-between gap-4 px-4 py-4 transition hover:bg-muted"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate font-medium text-foreground group-hover:text-primary">
+                              {caseItem.title}
+                            </p>
+                            <p className="mt-0.5 truncate text-sm text-muted-foreground">
+                              {caseItem.clientName}
+                              {" · "}
+                              {caseItem.currentStageTitle ?? "—"}
+                            </p>
+                          </div>
+                          <span
+                            className={cn(
+                              "shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold tracking-wide uppercase",
+                              statusClass(caseItem.status),
+                            )}
+                          >
+                            {caseItem.status.replace("_", " ")}
+                          </span>
+                        </Link>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -473,7 +572,7 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                                     .toUpperCase()
                                 : "TBD"}
                             </p>
-                            <p className="mt-2 font-medium text-secondary">{hearing.title}</p>
+                            <p className="mt-2 font-medium text-foreground">{hearing.title}</p>
                             <p className="home-muted mt-1 text-sm">{hearing.caseTitle}</p>
                             {hearing.location ? (
                               <p className="home-subtle mt-0.5 text-xs">{hearing.location}</p>
@@ -519,7 +618,8 @@ export function LawyerDashboard({ session }: LawyerDashboardProps) {
                 </div>
               </section>
             </aside>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </DashboardShell>

@@ -15,8 +15,6 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import "@cyntler/react-doc-viewer/dist/index.css";
 import { renderAsync } from "docx-preview";
 import {
   addTicketMessage,
@@ -118,7 +116,7 @@ const linkifyHtml = (html: string): string => {
   const urlRe = /(https?:\/\/[^\s<>"']+[^\s<>"'.,;:!?)\]])/g;
   const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
   const linkAttrs =
-    'class="text-[#d4af37] underline hover:opacity-80 break-all" target="_blank" rel="noopener noreferrer"';
+    'class="text-primary underline hover:opacity-80 break-all" target="_blank" rel="noopener noreferrer"';
   const parts = html.split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi);
   return parts
     .map((seg) => {
@@ -144,27 +142,27 @@ const MessageBody: React.FC<{ content: string; className?: string }> = ({
   if (isHtml) {
     return (
       <div
-        className={`ckeditor-message-content prose prose-invert prose-sm mb-1 max-w-none text-sm text-[#f4ede4] [&_*]:text-[#ebe3d9] [&_a]:text-[#d4af37] [&_a]:underline ${className || ""}`}
+        className={`ckeditor-message-content prose prose-sm mb-1 max-w-none text-sm text-foreground [&_*]:text-foreground [&_a]:text-primary [&_a]:underline ${className || ""}`}
         dangerouslySetInnerHTML={{ __html: linkifyHtml(content) }}
       />
     );
   }
   return (
     <div
-      className={`prose prose-invert prose-sm mb-1 max-w-none text-sm text-[#f4ede4] [&_blockquote]:text-white/85 [&_code]:text-[#f4ede4] ${className || ""}`}
+      className={`prose prose-sm mb-1 max-w-none text-sm text-foreground [&_blockquote]:text-muted-foreground [&_code]:text-foreground ${className || ""}`}
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          p: ({ children }) => <span className="text-[#f4ede4]">{children}</span>,
+          p: ({ children }) => <span className="text-foreground">{children}</span>,
           strong: ({ children }) => (
-            <strong className="font-semibold text-white">{children}</strong>
+            <strong className="font-semibold text-foreground">{children}</strong>
           ),
           li: ({ children }) => (
-            <li className="text-[#ebe3d9]">{children}</li>
+            <li className="text-foreground">{children}</li>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-[#d4af37]/40 pl-2 text-[#ebe3d9] italic">
+            <blockquote className="border-l-2 border-primary/40 pl-2 text-muted-foreground">
               {children}
             </blockquote>
           ),
@@ -980,21 +978,21 @@ export default function UserTicketDashboard({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "open":
-        return "text-[#d4af37]";
+        return "text-primary";
       case "in-progress":
-        return "text-amber-300";
+        return "text-primary";
       case "resolved":
-        return "text-emerald-400";
+        return "text-muted-foreground";
       case "closed":
-        return "text-white/40";
+        return "text-muted-foreground";
       default:
-        return "text-white/40";
+        return "text-muted-foreground";
     }
   };
 
   return (
     <div
-      className={`${isCompact ? "h-full" : "h-[var(--ticket-h,100dvh)]"} flex w-full overflow-hidden bg-gradient-to-br from-[#1a0f0e] via-[#140c0a] to-[#1a0f0e]`}
+      className={`${isCompact ? "h-full" : "h-[var(--ticket-h,100dvh)]"} flex w-full overflow-hidden bg-background`}
     >
       <UserTicketSidebar
         tickets={tickets}
@@ -1018,18 +1016,18 @@ export default function UserTicketDashboard({
       />
 
       <div
-        className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#1a0f0e] ${isCompact && !showChatView ? "hidden" : ""}`}
+        className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background ${isCompact && !showChatView ? "hidden" : ""}`}
       >
         {!ticketsLoaded ? (
-          <div className="flex flex-1 items-center justify-center text-white/50">Loading…</div>
+          <div className="flex flex-1 items-center justify-center text-muted-foreground">Loading…</div>
         ) : selectedTicket ? (
           <>
-            <div className="z-30 shrink-0 border-b border-[#d4af37]/20 bg-[#1a0f0e]">
+            <div className="z-30 shrink-0 border-b border-border bg-card">
               <div className="flex items-center gap-2 px-3 py-2.5 md:px-6">
                 {isCompact ? (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg p-2 text-white/60 hover:bg-white/5 hover:text-white"
+                    className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                     onClick={() => setShowChatView(false)}
                   >
                     <Menu className="h-5 w-5" />
@@ -1037,24 +1035,24 @@ export default function UserTicketDashboard({
                 ) : (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg p-2 text-white/60 hover:bg-white/5 hover:text-white md:hidden"
+                    className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
                     onClick={() => setSidebarOpen(true)}
                   >
                     <Menu className="h-5 w-5" />
                   </button>
                 )}
-                <h1 className="min-w-0 flex-1 truncate text-base font-semibold text-white md:text-lg">
+                <h1 className="min-w-0 flex-1 truncate text-base font-semibold tracking-tight text-foreground md:text-lg">
                   {selectedTicket.subject}
                 </h1>
                 <span
-                  className={`shrink-0 rounded-md border border-[#d4af37]/30 px-2 py-0.5 text-[10px] capitalize md:text-xs ${getStatusColor(selectedTicket.status)}`}
+                  className={`shrink-0 rounded-full border border-border px-2.5 py-0.5 text-[10px] capitalize md:text-xs ${getStatusColor(selectedTicket.status)}`}
                 >
                   {selectedTicket.status}
                 </span>
                 {!isCompact && (
                   <button
                     type="button"
-                    className="rounded-lg p-2 text-white/60 hover:text-[#d4af37] md:hidden"
+                    className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
                     onClick={() => router.push("/dashboard")}
                   >
                     <Home className="h-5 w-5" />
@@ -1065,7 +1063,7 @@ export default function UserTicketDashboard({
                 queueStats.openCount > 0 &&
                 !(messages as { senderType?: string }[]).some((m) => m.senderType === "admin") && (
                   <div className="px-3 pb-2 md:px-6">
-                    <div className="inline-flex items-center gap-2 rounded-md border border-[#d4af37]/40 bg-[#d4af37]/10 px-2 py-1 text-[11px] text-[#d4af37]">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] text-foreground">
                       Approx{" "}
                       {queueStats.estimatedWaitMinutes >= 60
                         ? `${Math.floor(queueStats.estimatedWaitMinutes / 60)}h ${queueStats.estimatedWaitMinutes % 60}m`
@@ -1083,21 +1081,21 @@ export default function UserTicketDashboard({
                     type="button"
                     disabled={loadingMoreMessages}
                     onClick={loadMoreMessages}
-                    className="rounded-lg border border-[#d4af37]/50 px-4 py-2 text-sm text-[#d4af37] hover:bg-[#d4af37]/10"
+                    className="rounded-[10px] border border-border px-4 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
                   >
                     {loadingMoreMessages ? "Loading…" : "Load older messages"}
                   </button>
                 </div>
               )}
               {messagesLoading && !initialMessagesLoaded ? (
-                <p className="text-center text-white/40">Loading messages…</p>
+                <p className="text-center text-muted-foreground">Loading messages…</p>
               ) : (
                 <div className="space-y-6">
                   {Object.entries(groupMessagesByDate(messages)).map(
                     ([label, list]) => (
                       <div key={label} className="space-y-3">
                         <div className="flex justify-center">
-                          <span className="rounded-full border border-[#d4af37]/25 bg-[#2a1815]/80 px-4 py-1 text-xs text-white/60">
+                          <span className="rounded-full border border-border bg-muted px-4 py-1 text-xs text-muted-foreground">
                             {label}
                           </span>
                         </div>
@@ -1110,7 +1108,7 @@ export default function UserTicketDashboard({
                               <div className="mt-1 flex gap-1">
                                 <button
                                   type="button"
-                                  className="rounded-lg border border-[#d4af37]/30 bg-[#2a1815]/80 p-1.5 text-[#d4af37]"
+                                  className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
                                   onClick={() => setReplyingTo(message)}
                                 >
                                   <Reply className="h-3.5 w-3.5" />
@@ -1118,7 +1116,7 @@ export default function UserTicketDashboard({
                                 {canEditMessage(message) && (
                                   <button
                                     type="button"
-                                    className="rounded-lg border border-[#d4af37]/30 bg-[#2a1815]/80 p-1.5 text-[#d4af37]"
+                                    className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
                                     onClick={() => {
                                       setEditingMessage(message);
                                       setNewMessage(message.message || "");
@@ -1130,13 +1128,13 @@ export default function UserTicketDashboard({
                               </div>
                             )}
                             <div
-                              className={`relative max-w-[80%] rounded-2xl border p-3 text-[#f4ede4] [&_img]:rounded ${
+                              className={`relative max-w-[80%] rounded-2xl border p-3.5 text-foreground [&_img]:rounded-xl ${
                                 message.senderType === "user"
-                                  ? "border-[#3e2723]/60 bg-gradient-to-br from-[#3e2723]/40 to-[#1a0f0e]/80"
-                                  : "border-[#d4af37]/25 bg-[#2a1815]/70"
+                                  ? "border-transparent bg-primary/15"
+                                  : "border-border bg-muted"
                               }`}
                             >
-                              {message.type === "image" && message.imageUrl && (
+                              {message.type === "image" && Boolean(message.imageUrl) && (
                                 <img
                                   src={String(message.imageUrl)}
                                   alt=""
@@ -1144,7 +1142,7 @@ export default function UserTicketDashboard({
                                   onClick={() => setSelectedImage(String(message.imageUrl))}
                                 />
                               )}
-                              {message.type === "video" && message.imageUrl && (
+                              {message.type === "video" && Boolean(message.imageUrl) && (
                                 <video
                                   src={String(message.imageUrl)}
                                   className="mb-2 max-h-48 rounded"
@@ -1152,13 +1150,13 @@ export default function UserTicketDashboard({
                                   controlsList="nodownload"
                                 />
                               )}
-                              {message.type === "document" && message.imageUrl && (
+                              {message.type === "document" && Boolean(message.imageUrl) && (
                                 <button
                                   type="button"
-                                  className="mb-2 flex w-full items-center gap-2 rounded-lg border border-[#d4af37]/30 bg-[#d4af37]/10 p-2 text-left text-sm text-white"
+                                  className="mb-2 flex w-full items-center gap-2 rounded-xl border border-border bg-card p-2.5 text-left text-sm text-foreground hover:bg-muted"
                                   onClick={() => setSelectedDocument(String(message.imageUrl))}
                                 >
-                                  <FileText className="h-6 w-6 shrink-0 text-[#d4af37]" />
+                                  <FileText className="h-6 w-6 shrink-0 text-primary" />
                                   <span className="truncate">Open document</span>
                                 </button>
                               )}
@@ -1191,9 +1189,9 @@ export default function UserTicketDashboard({
             </div>
 
             {selectedTicket.status !== "closed" && !isUserBlocked ? (
-              <div className="shrink-0 border-t border-[#d4af37]/20 bg-[#1a0f0e]/95 p-3 backdrop-blur md:p-4">
-                {replyingTo && (
-                  <div className="mb-2 flex items-start justify-between rounded-lg border border-[#d4af37]/30 bg-[#2a1815] p-2 text-xs text-white/70">
+              <div className="shrink-0 border-t border-border bg-card p-3 md:p-4">
+                {Boolean(replyingTo) && (
+                  <div className="mb-2 flex items-start justify-between rounded-xl border border-border bg-muted p-2.5 text-xs text-muted-foreground">
                     <span>Replying to legal team</span>
                     <button type="button" onClick={() => setReplyingTo(null)}>
                       <X className="h-4 w-4" />
@@ -1212,7 +1210,7 @@ export default function UserTicketDashboard({
                 <form onSubmit={handleSendMessage} className="flex items-end gap-2">
                   <button
                     type="button"
-                    className="shrink-0 rounded-xl p-2 text-[#d4af37] disabled:opacity-40"
+                    className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-40"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingImage}
                   >
@@ -1224,47 +1222,47 @@ export default function UserTicketDashboard({
                     onChange={(e) => setNewMessage(e.target.value)}
                     rows={1}
                     placeholder="Message your legal team…"
-                    className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-[#d4af37]/30 bg-[#140c0a]/80 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-[#d4af37]/60 focus:outline-none"
+                    className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
                   />
                   <button
                     type="submit"
                     disabled={sending || (!newMessage.trim() && pendingImageUrls.length === 0)}
-                    className="shrink-0 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#3e2723] p-3 text-white disabled:opacity-40"
+                    className="shrink-0 rounded-[10px] bg-primary p-3 text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
                   >
                     <Send className="h-5 w-5" />
                   </button>
                 </form>
               </div>
             ) : (
-              <div className="shrink-0 border-t border-white/10 p-4 text-center text-sm text-white/50">
+              <div className="shrink-0 border-t border-border p-4 text-center text-sm text-muted-foreground">
                 This thread is closed. You cannot send new messages here.
               </div>
             )}
           </>
         ) : tickets.length === 0 || showNewConversation ? (
           <div className="flex min-h-0 flex-1 flex-col">
-            <div className="shrink-0 border-b border-[#d4af37]/20 px-4 py-3 md:hidden">
+            <div className="shrink-0 border-b border-border px-4 py-3 md:hidden">
               <div className="flex items-center gap-2">
-                <button type="button" onClick={() => setSidebarOpen(true)} className="text-white/60">
+                <button type="button" onClick={() => setSidebarOpen(true)} className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
                   <Menu className="h-5 w-5" />
                 </button>
-                <h2 className="font-semibold text-white">New message</h2>
+                <h2 className="font-semibold tracking-tight text-foreground">New message</h2>
               </div>
             </div>
-            <div className="scrollbar-themed min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
+            <div className="scrollbar-themed min-h-0 flex-1 space-y-4 overflow-y-auto p-4 md:p-6">
               {chatWithLawyer ? (
-                <div className="rounded-2xl border border-[#d4af37]/35 bg-[#2a1815]/70 px-4 py-3 text-sm text-white/90">
+                <div className="rounded-2xl border border-border bg-muted px-4 py-3 text-sm text-foreground">
                   New thread with{" "}
-                  <span className="font-semibold text-[#d4af37]">{chatWithLawyer.fullName}</span>
+                  <span className="font-semibold text-primary">{chatWithLawyer.fullName}</span>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-white/10 bg-[#2a1815]/40 px-4 py-3 text-sm text-white/70">
+                <div className="rounded-2xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
                   Choose an advocate under{" "}
-                  <span className="font-medium text-[#d4af37]">Find a lawyer</span>, then tap{" "}
-                  <span className="font-medium text-white">Chat</span> to message them here.
+                  <span className="font-medium text-primary">Find a lawyer</span>, then tap{" "}
+                  <span className="font-medium text-foreground">Chat</span> to message them here.
                 </div>
               )}
-              <div className="rounded-2xl border border-[#d4af37]/25 bg-[#2a1815]/60 p-3 text-sm text-white/85">
+              <div className="rounded-2xl border border-border bg-muted p-3 text-sm text-foreground">
                 What can we help you with?
               </div>
               <div className="flex flex-wrap gap-2">
@@ -1278,10 +1276,10 @@ export default function UserTicketDashboard({
                       if (needsCaseRefPrompt(c)) setIntakeStep("case_ref");
                       else setIntakeStep("done");
                     }}
-                    className={`rounded-xl border px-3 py-2 text-xs font-medium ${
+                    className={`rounded-[10px] border px-3 py-2 text-xs font-medium ${
                       intake.category === c
-                        ? "border-[#d4af37] bg-[#d4af37]/20 text-white"
-                        : "border-[#d4af37]/30 text-white/80 hover:border-[#d4af37]/60"
+                        ? "border-primary bg-primary/15 text-foreground"
+                        : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
                     }`}
                   >
                     {CATEGORY_LABELS[c]}
@@ -1291,19 +1289,19 @@ export default function UserTicketDashboard({
 
               {intake.category && needsCaseRefPrompt(intake.category) && intakeStep === "case_ref" && (
                 <div className="space-y-2">
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-muted-foreground">
                     Optional: matter or case reference (court file no., internal ID)
                   </p>
                   <div className="flex gap-2">
                     <input
                       value={caseRefInput}
                       onChange={(e) => setCaseRefInput(e.target.value)}
-                      className="flex-1 rounded-xl border border-[#d4af37]/30 bg-[#140c0a] px-3 py-2 text-sm text-white"
+                      className="flex-1 rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
                       placeholder="e.g. LW-2024-8921"
                     />
                     <button
                       type="button"
-                      className="rounded-xl bg-[#d4af37] px-4 py-2 text-sm font-medium text-[#3e2723]"
+                      className="rounded-[10px] bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                       onClick={() => {
                         setIntake((prev) => ({
                           ...prev,
@@ -1317,7 +1315,7 @@ export default function UserTicketDashboard({
                   </div>
                   <button
                     type="button"
-                    className="text-xs text-[#d4af37]/80 underline"
+                    className="text-xs text-muted-foreground underline hover:text-foreground"
                     onClick={() => setIntakeStep("done")}
                   >
                     Skip
@@ -1326,7 +1324,7 @@ export default function UserTicketDashboard({
               )}
 
               {intakeStep === "done" && intake.category && (
-                <p className="text-sm text-[#d4af37]/90">
+                <p className="text-sm text-muted-foreground">
                   Describe your question or situation in detail below. Do not include passwords or full card numbers.
                 </p>
               )}
@@ -1334,7 +1332,7 @@ export default function UserTicketDashboard({
             {canCreateTicket ? (
               <form
                 onSubmit={handleSendMessage}
-                className="shrink-0 border-t border-[#d4af37]/20 bg-[#1a0f0e] p-3"
+                className="shrink-0 border-t border-border bg-card p-3 md:p-4"
               >
                 <div className="flex gap-2">
                   <textarea
@@ -1346,19 +1344,19 @@ export default function UserTicketDashboard({
                         ? "Complete the steps above first…"
                         : "Type your message…"
                     }
-                    className="max-h-36 min-h-[48px] flex-1 resize-none rounded-xl border border-[#d4af37]/30 bg-[#140c0a] px-3 py-2 text-sm text-white disabled:opacity-50"
+                    className="max-h-36 min-h-[48px] flex-1 resize-none rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30 disabled:opacity-50"
                   />
                   <button
                     type="submit"
                     disabled={sending || !newMessage.trim() || intakeStep !== "done"}
-                    className="self-end rounded-xl bg-gradient-to-br from-[#d4af37] to-[#3e2723] p-3 text-white disabled:opacity-40"
+                    className="self-end rounded-[10px] bg-primary p-3 text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
                   >
                     <Send className="h-5 w-5" />
                   </button>
                 </div>
               </form>
             ) : (
-              <p className="shrink-0 p-4 text-center text-sm text-white/50">
+              <p className="shrink-0 p-4 text-center text-sm text-muted-foreground">
                 {chatWithLawyer
                   ? `You already have an open conversation with ${chatWithLawyer.fullName}. Open it from the list, or wait until it is closed.`
                   : "Choose an advocate from Find a lawyer to start a new thread, or open an existing conversation from the list."}
@@ -1367,8 +1365,8 @@ export default function UserTicketDashboard({
           </div>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-            <MessageCircle className="h-10 w-10 text-[#d4af37]/60" />
-            <p className="text-sm text-white/60">Select a conversation</p>
+            <MessageCircle className="h-10 w-10 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Select a conversation</p>
           </div>
         )}
       </div>
@@ -1396,51 +1394,50 @@ export default function UserTicketDashboard({
           role="presentation"
         >
           <div
-            className="relative flex h-[90vh] max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#d4af37]/30 bg-[#1a0f0e]"
+            className="relative flex h-[90vh] max-w-4xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal
           >
-            <div className="flex items-center justify-between border-b border-[#d4af37]/30 p-3">
-              <span className="font-medium text-white">Document</span>
+            <div className="flex items-center justify-between border-b border-border p-3">
+              <span className="font-semibold tracking-tight text-foreground">Document</span>
               <div className="flex gap-2">
                 <a
                   href={selectedDocument}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg bg-[#d4af37] px-3 py-1.5 text-sm font-medium text-[#3e2723]"
+                  className="rounded-[10px] bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Open
                 </a>
                 <button
                   type="button"
-                  className="rounded-lg p-2 text-white/70 hover:bg-white/10"
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                   onClick={() => setSelectedDocument(null)}
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
-            <div className="min-h-0 flex-1 overflow-auto bg-[#111]">
+            <div className="min-h-0 flex-1 overflow-auto bg-muted p-3">
               {isWordDocument(selectedDocument) ? (
                 <div
                   ref={docxContainerRef}
-                  className="min-h-[50vh] bg-white p-4 text-black"
+                  className="min-h-[50vh] rounded-xl border border-border bg-white p-4 text-black"
                 />
               ) : isPdfDocument(selectedDocument) ? (
-                <DocViewer
-                  documents={[{ uri: selectedDocument }]}
-                  pluginRenderers={DocViewerRenderers}
-                  style={{ height: "100%", minHeight: 480 }}
-                  config={{ header: { disableHeader: true } }}
+                <iframe
+                  title="PDF document"
+                  src={selectedDocument}
+                  className="h-full min-h-[480px] w-full rounded-xl border border-border bg-white"
                 />
               ) : (
-                <div className="p-8 text-center text-white/60">
+                <div className="p-8 text-center text-muted-foreground">
                   <a
                     href={selectedDocument}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[#d4af37] underline"
+                    className="text-primary underline"
                   >
                     Download file
                   </a>

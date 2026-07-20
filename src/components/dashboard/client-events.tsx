@@ -44,18 +44,6 @@ export function ClientEvents() {
 
   return (
     <div className="mx-auto ">
-      <header className="mb-8">
-        <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
-          Calendar & updates
-        </p>
-        <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-secondary sm:text-4xl">
-          Events
-        </h1>
-        <p className="mt-2 max-w-xl text-sm text-neutral/65 sm:text-base">
-          Hearings, deadlines, meetings, and case updates from your legal team.
-        </p>
-      </header>
-
       <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Filter events">
         {FILTER_TABS.map((tab) => {
           const active = filter === tab.value;
@@ -69,8 +57,8 @@ export function ClientEvents() {
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-medium transition",
                 active
-                  ? "bg-secondary text-white shadow-sm"
-                  : "dashboard-card text-neutral/65 hover:border-[var(--dashboard-border-hover)] hover:text-secondary",
+                  ? "bg-foreground text-background shadow-sm"
+                  : "dashboard-card text-muted-foreground hover:border-[var(--dashboard-border-hover)] hover:text-foreground",
               )}
             >
               {tab.label}
@@ -82,20 +70,20 @@ export function ClientEvents() {
       {loading ? (
         <ClientEventsSkeleton />
       ) : error ? (
-        <div className="dashboard-card-muted px-5 py-4 text-sm text-secondary">{error}</div>
+        <div className="dashboard-card-muted px-5 py-4 text-sm text-foreground">{error}</div>
       ) : events.length === 0 ? (
         <div className="dashboard-card-muted flex flex-col items-center justify-center px-6 py-16 text-center">
           <span className="dashboard-icon-wrap size-14">
             <CalendarDays className="size-7" aria-hidden />
           </span>
-          <p className="mt-4 font-medium text-secondary">No events found</p>
-          <p className="mt-1 max-w-sm text-sm text-neutral/55">
+          <p className="mt-4 font-medium text-foreground">No events found</p>
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             Events from your active cases will appear here.
           </p>
         </div>
       ) : (
         <>
-          <p className="mb-4 text-sm text-neutral/55">
+          <p className="mb-4 text-sm text-muted-foreground">
             {events.length} event{events.length === 1 ? "" : "s"}
           </p>
           <ul className="space-y-3" role="list">

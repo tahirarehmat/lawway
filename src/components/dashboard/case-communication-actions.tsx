@@ -81,7 +81,7 @@ export function CaseCommunicationActions({
           type="button"
           disabled={openingChat}
           onClick={() => void openChat()}
-          className="inline-flex gap-2 bg-secondary text-white hover:bg-secondary/90"
+          className="inline-flex gap-2"
         >
           <MessageCircle className="size-4" aria-hidden />
           {openingChat
@@ -94,7 +94,7 @@ export function CaseCommunicationActions({
           type="button"
           variant="outline"
           size="sm"
-          className="gap-1.5 border-black/10"
+          className="gap-1.5"
           onClick={startVoiceDemo}
         >
           <Phone className="size-3.5" aria-hidden />
@@ -106,7 +106,7 @@ export function CaseCommunicationActions({
           size="sm"
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),
-            "gap-1.5 border-primary/40 text-secondary hover:bg-primary/10",
+            "gap-1.5",
           )}
           onClick={() => setMeetingOpen(true)}
         >
