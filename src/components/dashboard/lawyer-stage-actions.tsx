@@ -93,9 +93,9 @@ export function LawyerStageActions({
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="rounded-xl border border-black/5 bg-white p-4">
-        <h3 className="text-sm font-semibold text-secondary">Stage actions</h3>
-        <p className="mt-1 text-xs text-neutral/55">
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <h3 className="text-sm font-semibold text-foreground">Stage actions</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
           Advance the case through your workflow pipeline.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
@@ -105,7 +105,6 @@ export function LawyerStageActions({
               size="sm"
               disabled={loadingStageId != null || adding}
               onClick={() => void runAction(inProgress.stageId, "stage_completed")}
-              className="bg-secondary text-white hover:bg-secondary/90"
             >
               Complete “{inProgress.title}”
             </Button>
@@ -117,7 +116,6 @@ export function LawyerStageActions({
               variant="outline"
               disabled={loadingStageId != null || adding}
               onClick={() => void runAction(nextPending.stageId, "stage_started")}
-              className="border-secondary/30 text-secondary"
             >
               Start “{nextPending.title}”
             </Button>
@@ -126,7 +124,7 @@ export function LawyerStageActions({
             <Button
               type="button"
               size="sm"
-              variant="outline"
+              variant="ghost"
               disabled={loadingStageId != null || adding}
               onClick={() =>
                 void runAction(
@@ -134,7 +132,6 @@ export function LawyerStageActions({
                   "stage_skipped",
                 )
               }
-              className="border-black/10 text-neutral/70"
             >
               Skip current stage
             </Button>
@@ -142,11 +139,11 @@ export function LawyerStageActions({
         </div>
       </div>
 
-      <div className="rounded-xl border border-black/5 bg-white p-4">
+      <div className="rounded-2xl border border-border bg-card p-6">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-secondary">Manage stages</h3>
-            <p className="mt-1 text-xs text-neutral/55">
+            <h3 className="text-sm font-semibold text-foreground">Manage stages</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
               Add custom steps or remove upcoming stages (not started yet).
             </p>
           </div>
@@ -157,7 +154,7 @@ export function LawyerStageActions({
               variant="outline"
               disabled={loadingStageId != null || adding}
               onClick={() => setShowAddForm(true)}
-              className="shrink-0 gap-1 border-secondary/30 text-secondary"
+              className="shrink-0 gap-1"
             >
               <Plus className="size-3.5" aria-hidden />
               Add stage
@@ -168,12 +165,12 @@ export function LawyerStageActions({
         {showAddForm ? (
           <form
             onSubmit={(e) => void handleAddStage(e)}
-            className="mt-4 space-y-3 rounded-lg border border-black/5 bg-tertiary/30 p-3"
+            className="mt-4 space-y-4 rounded-xl border border-border bg-muted p-4"
           >
             <div>
               <label
                 htmlFor="new-stage-title"
-                className="mb-1 block text-xs font-medium text-neutral/55"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
               >
                 Stage title
               </label>
@@ -183,14 +180,14 @@ export function LawyerStageActions({
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="e.g. Mediation"
-                className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
                 required
               />
             </div>
             <div>
               <label
                 htmlFor="new-stage-desc"
-                className="mb-1 block text-xs font-medium text-neutral/55"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
               >
                 Description (optional)
               </label>
@@ -199,16 +196,11 @@ export function LawyerStageActions({
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
                 rows={2}
-                className="w-full resize-y rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+                className="w-full resize-y rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
               />
             </div>
             <div className="flex gap-2">
-              <Button
-                type="submit"
-                size="sm"
-                disabled={adding}
-                className="bg-secondary text-white hover:bg-secondary/90"
-              >
+              <Button type="submit" size="sm" disabled={adding}>
                 {adding ? "Adding…" : "Save stage"}
               </Button>
               <Button
@@ -233,14 +225,14 @@ export function LawyerStageActions({
             {removableStages.map((stage) => (
               <li
                 key={stage.stageId}
-                className="flex items-center justify-between gap-2 rounded-lg border border-black/5 px-3 py-2"
+                className="flex items-center justify-between gap-2 rounded-xl border border-border px-3.5 py-2.5"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-secondary">
+                  <p className="truncate text-sm font-medium text-foreground">
                     {stage.title}
                   </p>
                   {stage.description ? (
-                    <p className="truncate text-xs text-neutral/55">
+                    <p className="truncate text-xs text-muted-foreground">
                       {stage.description}
                     </p>
                   ) : null}
@@ -248,10 +240,10 @@ export function LawyerStageActions({
                 <Button
                   type="button"
                   size="sm"
-                  variant="outline"
+                  variant="destructive"
                   disabled={loadingStageId != null || adding}
                   onClick={() => void handleRemove(stage.stageId, stage.title)}
-                  className="shrink-0 border-rose-200 text-rose-700 hover:bg-rose-50"
+                  className="shrink-0"
                   aria-label={`Remove ${stage.title}`}
                 >
                   <Trash2 className="size-3.5" aria-hidden />
@@ -260,7 +252,7 @@ export function LawyerStageActions({
             ))}
           </ul>
         ) : (
-          <p className="mt-3 text-xs text-neutral/50">
+          <p className="mt-3 text-xs text-muted-foreground">
             No removable stages — only upcoming (pending) stages can be deleted.
           </p>
         )}

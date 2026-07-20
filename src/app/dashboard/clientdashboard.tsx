@@ -1,16 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
+  Bot,
   Briefcase,
   CalendarDays,
   ChevronRight,
   LifeBuoy,
   Scale,
   Search,
-  Sparkles,
 } from "lucide-react";
+import { LegalAiChatModal } from "@/components/dashboard/legal-ai-chat-modal";
 import type { CaseListItem } from "@/lib/cases";
 import type { ClientCaseEvent } from "@/lib/case-events";
 import { EVENT_TYPE_LABELS } from "@/lib/case-events";
@@ -18,7 +20,43 @@ import { formatDaysUntil, formatEventWhen } from "@/lib/format-event-date";
 import type { SessionPayload } from "@/lib/session";
 import { DashboardShell } from "@/app/components/layout/dashboard-shell";
 import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  ACCENTS,
+  BarList,
+  DonutChart,
+  StatCard,
+  type ChartDatum,
+} from "@/components/dashboard/dashboard-charts";
 import { cn } from "@/lib/utils";
+
+const CASE_STATUS_META: Record<string, { label: string; color: string }> = {
+  active: { label: "Active", color: ACCENTS.emerald.base },
+  on_hold: { label: "On hold", color: ACCENTS.amber.base },
+  closed: { label: "Closed", color: ACCENTS.violet.base },
+};
+
+const EVENT_PALETTE = [
+  ACCENTS.gold.base,
+  ACCENTS.sky.base,
+  ACCENTS.violet.base,
+  ACCENTS.emerald.base,
+  ACCENTS.amber.base,
+  ACCENTS.rose.base,
+];
+
+/** Demo chart data so graphs look populated while real volume is low */
+const DEMO_CASE_STATUS: ChartDatum[] = [
+  { label: "Active", value: 4, color: ACCENTS.emerald.base },
+  { label: "On hold", value: 2, color: ACCENTS.amber.base },
+  { label: "Closed", value: 3, color: ACCENTS.violet.base },
+];
+
+const DEMO_EVENT_TYPES: ChartDatum[] = [
+  { label: "Hearing", value: 3, color: ACCENTS.gold.base },
+  { label: "Deadline", value: 2, color: ACCENTS.sky.base },
+  { label: "Meeting", value: 4, color: ACCENTS.violet.base },
+  { label: "Filing", value: 1, color: ACCENTS.emerald.base },
+];
 
 type ClientDashboardProps = {
   session: SessionPayload;
@@ -62,6 +100,7 @@ export function ClientDashboard({
   upcomingEvents,
   pendingRequestCount,
 }: ClientDashboardProps) {
+  const [aiChatOpen, setAiChatOpen] = useState(false);
   const firstName = greetingName(session.email);
   const activeCases = cases.filter((c) => c.status === "active");
   const nextHearing = upcomingEvents.find((e) => e.eventType === "hearing") ?? upcomingEvents[0];
@@ -69,14 +108,53 @@ export function ClientDashboard({
   const uniqueLawyers = new Set(activeCases.map((c) => c.lawyerId)).size;
 
   const overviewStats = [
-    { label: "Active cases", value: String(activeCases.length), icon: Briefcase },
+    {
+      label: "Active cases",
+      value: String(activeCases.length),
+      icon: Briefcase,
+      accent: "emerald" as const,
+    },
     {
       label: "Next hearing",
       value: nextHearingDays ?? "—",
       icon: CalendarDays,
+      accent: "gold" as const,
     },
-    { label: "Advocates", value: String(uniqueLawyers), icon: Scale },
-  ] as const;
+    {
+      label: "Advocates",
+      value: String(uniqueLawyers),
+      icon: Scale,
+      accent: "violet" as const,
+    },
+  ];
+
+  const caseStatusData: ChartDatum[] = Object.entries(
+    cases.reduce<Record<string, number>>((acc, c) => {
+      acc[c.status] = (acc[c.status] ?? 0) + 1;
+      return acc;
+    }, {}),
+  ).map(([status, value]) => ({
+    label: CASE_STATUS_META[status]?.label ?? status.replace("_", " "),
+    value,
+    color: CASE_STATUS_META[status]?.color ?? ACCENTS.gold.base,
+  }));
+
+  const eventTypeData: ChartDatum[] = Object.entries(
+    upcomingEvents.reduce<Record<string, number>>((acc, e) => {
+      acc[e.eventType] = (acc[e.eventType] ?? 0) + 1;
+      return acc;
+    }, {}),
+  ).map(([type, value], i) => ({
+    label: EVENT_TYPE_LABELS[type as keyof typeof EVENT_TYPE_LABELS] ?? type,
+    value,
+    color: EVENT_PALETTE[i % EVENT_PALETTE.length],
+  }));
+
+  const portfolioData =
+    caseStatusData.length >= 2 ? caseStatusData : DEMO_CASE_STATUS;
+  const portfolioTotal = portfolioData.reduce((sum, d) => sum + d.value, 0);
+  const activityData =
+    eventTypeData.length > 0 ? eventTypeData : DEMO_EVENT_TYPES;
 
   return (
     <DashboardShell session={session} activeItem="Home">
@@ -90,14 +168,14 @@ export function ClientDashboard({
           </h1>
         </header> */}
 
-        <section className="home-outer mb-6" aria-label="Overview">
-          <div className="home-outer-body">
+        <section className="mb-6" aria-label="Overview">
+          <div>
             <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
-              <div className="home-inner flex flex-1 flex-col justify-center p-5 sm:p-6 lg:p-7">
+              <div className="home-hero flex flex-1 flex-col justify-center p-6 sm:p-7 lg:p-8">
                 <p className="home-subtle text-[11px] font-medium tracking-[0.18em] uppercase">
                   {formatToday()}
                 </p>
-                <h2 className="mt-3 font-serif text-2xl font-medium tracking-tight text-secondary sm:text-3xl">
+                <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
                   Hello, {firstName}
                 </h2>
                 <p className="home-muted mt-3 text-sm leading-relaxed sm:text-base">
@@ -114,7 +192,7 @@ export function ClientDashboard({
                     href="/dashboard/search"
                     className={cn(
                       buttonVariants({ variant: "default", size: "default" }),
-                      "inline-flex bg-primary text-secondary hover:bg-primary/90",
+                      "inline-flex",
                     )}
                   >
                     <Search className="size-4" aria-hidden />
@@ -124,7 +202,7 @@ export function ClientDashboard({
                     href="/dashboard/events"
                     className={cn(
                       buttonVariants({ variant: "outline", size: "default" }),
-                      "inline-flex border-[color-mix(in_srgb,var(--secondary)_18%,transparent)] text-secondary hover:bg-[color-mix(in_srgb,var(--primary)_10%,white)]",
+                      "inline-flex",
                     )}
                   >
                     View events
@@ -155,7 +233,7 @@ export function ClientDashboard({
                     <p className="home-accent text-[11px] uppercase tracking-wide">
                       {EVENT_TYPE_LABELS[nextHearing.eventType]}
                     </p>
-                    <p className="mt-2 font-serif text-3xl font-medium text-secondary">
+                    <p className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
                       {nextHearingDays ?? "Soon"}
                     </p>
                     <p className="home-muted mt-2 text-sm leading-snug line-clamp-2">
@@ -178,21 +256,49 @@ export function ClientDashboard({
               )}
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {overviewStats.map((stat) => (
-                <div key={stat.label} className="home-inner p-4 sm:p-5">
-                  <div className="home-muted flex items-center gap-1.5">
-                    <stat.icon className="size-3.5 shrink-0 text-primary" aria-hidden />
-                    <span className="truncate text-[10px] font-medium tracking-wide uppercase sm:text-[11px]">
-                      {stat.label}
-                    </span>
-                  </div>
-                  <p className="home-stat-value mt-2">{stat.value}</p>
-                </div>
+                <StatCard
+                  key={stat.label}
+                  label={stat.label}
+                  value={stat.value}
+                  icon={stat.icon}
+                  accent={stat.accent}
+                />
               ))}
             </div>
           </div>
         </section>
+
+        <div className="mb-6 grid gap-6 md:grid-cols-2">
+          <section className="home-outer" aria-labelledby="case-mix-heading">
+            <div className="home-outer-header">
+              <h2 id="case-mix-heading" className="home-outer-title">
+                Case portfolio
+              </h2>
+              <span className="home-subtle text-xs">By status</span>
+            </div>
+            <div className="home-outer-body">
+              <DonutChart
+                data={portfolioData}
+                centerValue={String(portfolioTotal)}
+                centerLabel="Cases"
+              />
+            </div>
+          </section>
+
+          <section className="home-outer" aria-labelledby="event-mix-heading">
+            <div className="home-outer-header">
+              <h2 id="event-mix-heading" className="home-outer-title">
+                Upcoming activity
+              </h2>
+              <span className="home-subtle text-xs">By type</span>
+            </div>
+            <div className="home-outer-body">
+              <BarList data={activityData} />
+            </div>
+          </section>
+        </div>
 
         <div className="grid gap-6 lg:grid-cols-12">
           <section
@@ -228,7 +334,7 @@ export function ClientDashboard({
                         <span className="min-w-0 flex-1">
                           <span className="flex flex-wrap items-start justify-between gap-2">
                             <span>
-                              <span className="mt-1 block font-medium text-secondary">
+                              <span className="mt-1 block font-medium text-foreground">
                                 {caseItem.title}
                               </span>
                             </span>
@@ -255,7 +361,7 @@ export function ClientDashboard({
                   <span className="home-icon mx-auto size-12">
                     <Briefcase className="size-5" aria-hidden />
                   </span>
-                  <p className="mt-4 text-sm font-medium text-secondary">No active cases</p>
+                  <p className="mt-4 text-sm font-medium text-foreground">No active cases</p>
                   <p className="home-muted mt-1 text-xs">
                     Submit a request or connect with an advocate to open your first matter.
                   </p>
@@ -263,7 +369,7 @@ export function ClientDashboard({
                     href="/dashboard/requests/new"
                     className={cn(
                       buttonVariants({ variant: "default", size: "default" }),
-                      "mt-5 inline-flex bg-primary text-secondary hover:bg-primary/90",
+                      "mt-5 inline-flex",
                     )}
                   >
                     New case request
@@ -300,7 +406,7 @@ export function ClientDashboard({
                               <span className="home-pill">
                                 {EVENT_TYPE_LABELS[event.eventType]}
                               </span>
-                              <p className="mt-2 text-sm font-medium text-secondary">
+                              <p className="mt-2 text-sm font-medium text-foreground">
                                 {event.title}
                               </p>
                               <p className="home-muted mt-1 text-xs">
@@ -323,38 +429,39 @@ export function ClientDashboard({
               </div>
             </section>
 
-            <section className="home-outer" aria-labelledby="ai-brief-heading">
-              <div className="home-outer-header">
-                <h2 id="ai-brief-heading" className="home-outer-title">
-                  Legal AI brief
-                </h2>
-              </div>
-              <div className="home-outer-body-tight">
-                <div className="home-inner p-5 sm:p-6">
-                  <div className="flex items-start gap-3">
-                    <span className="home-icon size-10 shrink-0">
-                      <Sparkles className="size-[1.125rem]" aria-hidden />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="home-muted text-sm leading-relaxed">
-                        {activeCases.length > 0
-                          ? `You have ${activeCases.length} active case${activeCases.length === 1 ? "" : "s"}. Open a case to review progress and upcoming deadlines.`
-                          : "Submit a case request to get started with Lawway Legal AI assistance."}
-                      </p>
-                      <Button
-                        variant="outline"
-                        className="mt-4 w-full border-[color-mix(in_srgb,var(--secondary)_14%,transparent)] bg-white/60 text-secondary hover:bg-[color-mix(in_srgb,var(--primary)_12%,white)]"
-                      >
-                        Ask Legal AI
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <section
+              className="home-outer flex flex-col items-center px-6 py-8 text-center"
+              aria-labelledby="ai-brief-heading"
+            >
+              <Bot
+                className="size-16 text-[var(--gold,#f5b73c)]"
+                strokeWidth={1.25}
+                aria-hidden
+              />
+              <h2
+                id="ai-brief-heading"
+                className="mt-4 text-lg font-semibold tracking-tight text-foreground"
+              >
+                Legal AI Assistant
+              </h2>
+              <p className="home-muted mt-2 max-w-xs text-sm leading-relaxed">
+                {activeCases.length > 0
+                  ? `You have ${activeCases.length} active case${activeCases.length === 1 ? "" : "s"}. Get instant answers on progress, deadlines, and next steps.`
+                  : "Ask questions, understand your options, and prepare before you submit a case request."}
+              </p>
+              <Button
+                className="mt-6 w-full gap-2 sm:w-auto sm:px-8"
+                onClick={() => setAiChatOpen(true)}
+              >
+                <Bot className="size-4" aria-hidden />
+                Start intelligent consultation
+              </Button>
             </section>
           </aside>
         </div>
       </div>
+
+      <LegalAiChatModal open={aiChatOpen} onClose={() => setAiChatOpen(false)} />
     </DashboardShell>
   );
 }

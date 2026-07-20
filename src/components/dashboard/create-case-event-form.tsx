@@ -55,12 +55,7 @@ export function CreateCaseEventForm({ caseId, onCreated }: CreateCaseEventFormPr
 
   if (!open) {
     return (
-      <Button
-        type="button"
-        size="sm"
-        onClick={() => setOpen(true)}
-        className="bg-primary text-secondary hover:bg-primary/90"
-      >
+      <Button type="button" size="sm" onClick={() => setOpen(true)}>
         Add event
       </Button>
     );
@@ -69,16 +64,16 @@ export function CreateCaseEventForm({ caseId, onCreated }: CreateCaseEventFormPr
   return (
     <form
       onSubmit={(e) => void handleSubmit(e)}
-      className="mt-4 space-y-3 rounded-xl border border-black/5 bg-white p-4"
+      className="mt-4 space-y-4 rounded-2xl border border-border bg-card p-6"
     >
-      <p className="text-sm font-semibold text-secondary">New case event</p>
+      <p className="text-sm font-semibold text-foreground">New case event</p>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-neutral/55">Type</label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Type</label>
         <select
           value={eventType}
           onChange={(e) => setEventType(e.target.value as CaseEventType)}
-          className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-secondary"
+          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30"
         >
           {EVENT_TYPES.map((t) => (
             <option key={t} value={t}>
@@ -89,49 +84,49 @@ export function CreateCaseEventForm({ caseId, onCreated }: CreateCaseEventFormPr
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-neutral/55">Title</label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Title</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
           required
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-xs font-medium text-neutral/55">Description</label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Description</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
-          className="w-full resize-y rounded-lg border border-black/10 px-3 py-2 text-sm"
+          className="w-full resize-y rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
         />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral/55">Starts at</label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Starts at</label>
           <input
             type="datetime-local"
             value={startsAt}
             onChange={(e) => setStartsAt(e.target.value)}
-            className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral/55">Location</label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Location</label>
           <input
             type="text"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
           />
         </div>
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" size="sm" disabled={submitting} className="bg-secondary text-white">
+        <Button type="submit" size="sm" disabled={submitting}>
           {submitting ? "Saving…" : "Save event"}
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={() => setOpen(false)}>

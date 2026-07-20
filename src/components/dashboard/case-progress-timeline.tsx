@@ -14,9 +14,9 @@ function stageDotClass(status: CaseStage["status"]): string {
     case "in_progress":
       return "bg-primary";
     case "skipped":
-      return "bg-neutral/40";
+      return "bg-muted-foreground/40";
     default:
-      return "bg-neutral/25";
+      return "bg-border";
   }
 }
 
@@ -27,7 +27,7 @@ function stageLineClass(status: CaseStage["status"]): string {
     case "in_progress":
       return "bg-primary/30";
     default:
-      return "bg-neutral/15";
+      return "bg-border";
   }
 }
 
@@ -43,7 +43,7 @@ function stageDetail(stage: CaseStage): string {
 export function CaseProgressTimeline({ stages }: CaseProgressTimelineProps) {
   if (stages.length === 0) {
     return (
-      <p className="text-sm text-neutral/55">No stages defined for this case yet.</p>
+      <p className="text-sm text-muted-foreground">No stages defined for this case yet.</p>
     );
   }
 
@@ -64,11 +64,11 @@ export function CaseProgressTimeline({ stages }: CaseProgressTimelineProps) {
             ) : null}
           </div>
           <div className={cn("min-w-0 pb-6", index === stages.length - 1 && "pb-0")}>
-            <p className="font-medium text-secondary">{stage.title}</p>
+            <p className="font-medium text-foreground">{stage.title}</p>
             {stage.description ? (
-              <p className="mt-0.5 text-sm text-neutral/60">{stage.description}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{stage.description}</p>
             ) : null}
-            <p className="mt-1 text-sm text-neutral/50">{stageDetail(stage)}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{stageDetail(stage)}</p>
           </div>
         </div>
       ))}

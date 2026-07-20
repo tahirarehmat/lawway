@@ -11,9 +11,8 @@ import {
   LayoutGrid,
   LifeBuoy,
   LogOut,
-  DoorClosed,
+  PanelLeft,
   Plus,
-  Scale,
   Search,
   Settings,
   CalendarDays,
@@ -21,6 +20,7 @@ import {
 import { logoutUser } from "@/lib/logout";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { LawwayLogo } from "@/components/lawway-logo";
 
 const SHARED_NAV_ITEMS = [
   { label: "Home", href: "/dashboard", icon: LayoutGrid },
@@ -53,19 +53,24 @@ type SidebarProps = {
   onToggle?: () => void;
 };
 
-function SidebarCollapseButton({ onCollapse }: { onCollapse: () => void }) {
+function SidebarToggleButton({
+  onToggle,
+  label,
+}: {
+  onToggle: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
       onClick={(e) => {
         e.stopPropagation();
-        onCollapse();
+        onToggle();
       }}
-      className="group flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/[0.06] text-white/80 transition hover:border-primary/50 hover:bg-white/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-      aria-label="Collapse sidebar"
-      aria-expanded
+      className="flex size-9 shrink-0 items-center justify-center text-white transition hover:text-[var(--gold,#f5b73c)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      aria-label={label}
     >
-      <DoorClosed className="size-[1.125rem] transition group-hover:scale-105" aria-hidden />
+      <PanelLeft className="size-5" strokeWidth={2.5} aria-hidden />
     </button>
   );
 }
@@ -105,56 +110,52 @@ export function Sidebar({
 
   return (
     <aside
-      onClick={collapsed && onToggle ? onToggle : undefined}
-      onKeyDown={
-        collapsed && onToggle
-          ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onToggle();
-              }
-            }
-          : undefined
-      }
-      role={collapsed ? "button" : undefined}
-      tabIndex={collapsed ? 0 : undefined}
-      aria-label={collapsed ? "Expand sidebar" : undefined}
       className={cn(
-        "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-[#523d39] bg-secondary text-white transition-[width] duration-300 ease-in-out lg:flex",
-        collapsed ? "w-[4.75rem] cursor-pointer" : "w-64",
+        "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-white/5 bg-[#16100c] text-white transition-[width] duration-300 ease-in-out lg:flex",
+        collapsed ? "w-[4.75rem]" : "w-64",
       )}
     >
       <div
         className={cn(
           "border-b border-white/10",
           collapsed
-            ? "flex justify-center px-3 py-4"
-            : "flex items-start justify-between gap-2 px-4 py-5",
+            ? "flex justify-center px-3 py-5"
+            : "flex items-start justify-between gap-2 px-5 py-6",
         )}
       >
-        <div
-          className={cn(
-            "flex min-w-0 items-center",
-            collapsed ? "justify-center" : "gap-3",
-          )}
-        >
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary">
-            <Scale className="size-5 text-secondary" />
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="font-serif text-lg font-medium text-primary">
-                Lawway Portal
-              </p>
-              <p className="mt-0.5 text-xs text-white/70">
-                Legal Management System
-              </p>
+        {collapsed && onToggle ? (
+          <button
+            type="button"
+            onClick={onToggle}
+            className="group relative flex size-10 shrink-0 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+          >
+            <span className="flex size-10 items-center justify-center transition-opacity group-hover:opacity-0">
+              <LawwayLogo className="h-9 w-auto" />
+            </span>
+            <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-[var(--gold,#f5b73c)]">
+              <PanelLeft className="size-5" strokeWidth={2.5} aria-hidden />
+            </span>
+          </button>
+        ) : (
+          <>
+            <div className="flex min-w-0 items-center gap-3">
+              <LawwayLogo className="h-10 w-auto" />
+              <div className="min-w-0">
+                <p className="text-base font-semibold tracking-tight text-primary">
+                  Lawway Portal
+                </p>
+                <p className="mt-0.5 text-xs text-white/60">
+                  Legal Management System
+                </p>
+              </div>
             </div>
-          )}
-        </div>
-        {!collapsed && onToggle ? (
-          <SidebarCollapseButton onCollapse={onToggle} />
-        ) : null}
+            {onToggle ? (
+              <SidebarToggleButton onToggle={onToggle} label="Collapse sidebar" />
+            ) : null}
+          </>
+        )}
       </div>
 
       <div
@@ -167,7 +168,7 @@ export function Sidebar({
           <Link
             href="/dashboard/requests/new"
             className={cn(
-              "flex items-center justify-center rounded-lg bg-primary font-semibold text-secondary transition hover:bg-primary/90",
+              "flex items-center justify-center rounded-[10px] bg-white font-bold text-black shadow-xs transition hover:bg-white/90",
               collapsed ? "size-11 shrink-0" : "h-11 w-full text-sm",
             )}
             aria-label="New Case File"
@@ -179,7 +180,7 @@ export function Sidebar({
           <Link
             href="/dashboard/cases"
             className={cn(
-              "flex items-center justify-center rounded-lg bg-primary font-semibold text-secondary transition hover:bg-primary/90",
+              "flex items-center justify-center rounded-[10px] bg-white font-bold text-black shadow-xs transition hover:bg-white/90",
               collapsed ? "size-11 shrink-0" : "h-11 w-full text-sm",
             )}
             aria-label="View cases"
@@ -206,7 +207,7 @@ export function Sidebar({
                     : "gap-3 px-3 py-2.5",
                   isActive
                     ? "bg-primary font-medium text-secondary"
-                    : "text-white/85 hover:bg-white/10 hover:text-white",
+                    : "text-white/75 hover:bg-white/10 hover:text-white",
                 )}
               >
                 <item.icon className="size-4 shrink-0" />
@@ -227,7 +228,7 @@ export function Sidebar({
             title="Settings"
             aria-label="Settings"
             className={cn(
-              "flex items-center rounded-lg text-sm text-white/85 transition hover:bg-white/10 hover:text-white",
+              "flex items-center rounded-lg text-sm text-white/75 transition hover:bg-white/10 hover:text-white",
               collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
             )}
           >
@@ -240,7 +241,7 @@ export function Sidebar({
             title="Logout"
             aria-label="Logout"
             className={cn(
-              "flex w-full items-center rounded-lg text-sm text-white/85 transition hover:cursor-pointer hover:bg-white/10 hover:text-white",
+              "flex w-full items-center rounded-lg text-sm text-white/75 transition hover:cursor-pointer hover:bg-white/10 hover:text-white",
               collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2.5",
             )}
           >

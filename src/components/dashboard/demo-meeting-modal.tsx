@@ -172,25 +172,25 @@ export function DemoMeetingModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-secondary/90 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/60 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Video meeting"
     >
-      <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-[#1a1412] shadow-2xl">
+      <div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-card shadow-[0_12px_32px_rgba(28,25,23,0.08)]">
         {phase === "summary" || phase === "saving" ? (
           <div className="flex flex-col p-6 sm:p-8">
-            <p className="text-[11px] font-medium uppercase tracking-widest text-primary">
+            <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
               Meeting ended
             </p>
-            <h2 className="mt-2 font-serif text-2xl text-white">Session summary</h2>
-            <p className="mt-2 text-sm text-white/65">
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground">Session summary</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
               This summary will be saved as a completed meeting on the case file.
             </p>
-            <pre className="mt-4 max-h-[50vh] overflow-y-auto whitespace-pre-wrap rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/90">
+            <pre className="mt-4 max-h-[50vh] overflow-y-auto whitespace-pre-wrap rounded-xl border border-border bg-muted px-4 py-3 text-sm text-foreground">
               {summary}
             </pre>
-            <p className="mt-4 text-sm text-white/60">
+            <p className="mt-4 text-sm text-muted-foreground">
               {phase === "saving"
                 ? "Saving completed meeting to the case timeline…"
                 : "Meeting saved."}
@@ -200,17 +200,11 @@ export function DemoMeetingModal({
                 <Button
                   type="button"
                   variant="outline"
-                  className="border-white/20 text-white hover:bg-white/10"
                   onClick={() => void saveAndClose()}
                 >
                   Retry save
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="border-white/20 text-white hover:bg-white/10"
-                  onClick={onClose}
-                >
+                <Button type="button" variant="outline" onClick={onClose}>
                   Close
                 </Button>
               </div>
@@ -218,15 +212,15 @@ export function DemoMeetingModal({
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
               <div>
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium text-foreground">
                   {phase === "connecting" ? "Joining meeting…" : "In meeting"}
                 </p>
-                <p className="text-xs text-white/55">{caseTitle}</p>
+                <p className="text-xs text-muted-foreground">{caseTitle}</p>
               </div>
               {phase === "in-call" ? (
-                <span className="rounded-full bg-rose-500/20 px-3 py-1 text-xs font-medium text-rose-300">
+                <span className="rounded-full bg-destructive/10 px-3 py-1 text-xs font-medium text-destructive">
                   LIVE · {secondsLeft}s demo
                 </span>
               ) : null}
@@ -244,7 +238,7 @@ export function DemoMeetingModal({
                 )}
               />
               {cameraError ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-secondary/80 p-6 text-center text-sm text-white/80">
+                <div className="absolute inset-0 flex items-center justify-center bg-foreground/80 p-6 text-center text-sm text-background">
                   {cameraError}
                 </div>
               ) : null}
@@ -257,23 +251,23 @@ export function DemoMeetingModal({
               </div>
 
               <div className="absolute right-4 top-4 flex w-36 flex-col gap-2 sm:w-44">
-                <div className="flex aspect-video items-center justify-center rounded-lg border border-white/15 bg-gradient-to-br from-secondary to-[#2a1f1c] text-center">
+                <div className="flex aspect-video items-center justify-center rounded-lg border border-border bg-muted text-center">
                   <div>
-                    <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/30 text-lg font-medium text-primary">
+                    <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/15 text-lg font-medium text-foreground">
                       {remoteName.charAt(0).toUpperCase()}
                     </div>
-                    <p className="text-xs text-white/80">{remoteName}</p>
+                    <p className="text-xs text-muted-foreground">{remoteName}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-3 border-t border-white/10 px-4 py-4">
+            <div className="flex items-center justify-center gap-3 border-t border-border px-6 py-4">
               <Button
                 type="button"
                 size="icon"
                 variant="outline"
-                className="size-11 rounded-full border-white/20 bg-white/5 text-white"
+                className="size-11 rounded-full"
                 onClick={toggleMic}
                 aria-label={micOn ? "Mute" : "Unmute"}
               >
@@ -283,7 +277,7 @@ export function DemoMeetingModal({
                 type="button"
                 size="icon"
                 variant="outline"
-                className="size-11 rounded-full border-white/20 bg-white/5 text-white"
+                className="size-11 rounded-full"
                 onClick={toggleVideo}
                 aria-label={videoOn ? "Stop video" : "Start video"}
               >
@@ -296,7 +290,7 @@ export function DemoMeetingModal({
               <Button
                 type="button"
                 size="icon"
-                className="size-12 rounded-full bg-rose-600 text-white hover:bg-rose-700"
+                className="size-12 rounded-full bg-destructive text-white hover:bg-destructive/90"
                 onClick={goToSummary}
                 aria-label="End meeting"
               >

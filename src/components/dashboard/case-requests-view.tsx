@@ -45,11 +45,11 @@ function statusLabel(status: CaseRequestStatus, role: "client" | "lawyer"): stri
 function statusBadgeClass(status: CaseRequestStatus): string {
   switch (status) {
     case "pending":
-      return "bg-amber-100 text-amber-900";
+      return "bg-amber-500/15 text-amber-300";
     case "accepted":
-      return "bg-emerald-100 text-emerald-900";
+      return "bg-emerald-500/15 text-emerald-300";
     default:
-      return "bg-neutral/15 text-neutral/70";
+      return "bg-muted text-muted-foreground";
   }
 }
 
@@ -133,33 +133,17 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
 
   return (
     <div className="mx-auto">
-      <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
-            {role === "client" ? "Your submissions" : "Client inbox"}
-          </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-secondary">
-            Requests
-          </h1>
-          <p className="mt-2 text-sm text-neutral/65">
-            {role === "client"
-              ? "Track pending, accepted, and declined case requests."
-              : "Review incoming matters and accept or decline client requests."}
-          </p>
-        </div>
-        {role === "client" ? (
+      {role === "client" ? (
+        <header className="mb-8 flex justify-end">
           <Link
             href="/dashboard/requests/new"
-            className={cn(
-              buttonVariants({ variant: "default" }),
-              "inline-flex gap-2 bg-primary text-secondary hover:bg-primary/90",
-            )}
+            className={cn(buttonVariants({ variant: "default" }), "inline-flex gap-2")}
           >
             <Plus className="size-4" aria-hidden />
             New request
           </Link>
-        ) : null}
-      </header>
+        </header>
+      ) : null}
 
       <div className="mb-6 flex flex-wrap gap-2">
         {TABS.map((tab) => {
@@ -178,15 +162,15 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
               type="button"
               onClick={() => setFilter(tab.id)}
               className={cn(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition",
+                "rounded-full px-4 py-1.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
                 active
-                  ? "bg-secondary text-white"
-                  : "bg-white text-neutral/70 ring-1 ring-black/8 hover:bg-tertiary",
+                  ? "bg-foreground text-background"
+                  : "bg-card text-muted-foreground border border-border hover:bg-muted",
               )}
             >
               {tab.label}
               {count > 0 ? (
-                <span className={cn("ml-1.5", active ? "text-white/80" : "text-neutral/45")}>
+                <span className={cn("ml-1.5", active ? "text-background/70" : "text-muted-foreground")}>
                   ({count})
                 </span>
               ) : null}
@@ -196,18 +180,18 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
       </div>
 
       {loading ? (
-        <p className="text-sm text-neutral/55">Loading requests…</p>
+        <p className="text-sm text-muted-foreground">Loading requests…</p>
       ) : error ? (
-        <p className="text-sm text-rose-700">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       ) : filtered.length === 0 ? (
-        <div className="dashboard-card-muted flex flex-col items-center px-6 py-14 text-center">
-          <Inbox className="size-10 text-neutral/35" aria-hidden />
-          <p className="mt-4 font-medium text-secondary">
+        <div className="dashboard-card-muted flex flex-col items-center px-6 py-16 text-center">
+          <Inbox className="size-10 text-muted-foreground" aria-hidden />
+          <p className="mt-4 font-medium text-foreground">
             {filter === "all"
               ? "No requests yet"
               : `No ${filter === "cancelled" ? "declined" : filter} requests`}
           </p>
-          <p className="mt-1 max-w-sm text-sm text-neutral/55">
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
             {role === "client"
               ? filter === "all"
                 ? "Submit a case request from Search or create a new matter."
@@ -219,10 +203,7 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
           {role === "client" && filter === "all" ? (
             <Link
               href="/dashboard/requests/new"
-              className={cn(
-                buttonVariants(),
-                "mt-6 bg-primary text-secondary hover:bg-primary/90",
-              )}
+              className={cn(buttonVariants(), "mt-6")}
             >
               Submit a request
             </Link>
@@ -233,15 +214,15 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
           {filtered.map((req) => (
             <li
               key={req.requestId}
-              className="dashboard-card flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:justify-between"
+              className="dashboard-card flex flex-col gap-4 p-6 sm:flex-row sm:items-start sm:justify-between"
             >
               <div className="flex min-w-0 flex-1 gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-tertiary text-secondary">
+                <div className="dashboard-icon-wrap size-10 shrink-0">
                   <Gavel className="size-5" aria-hidden />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium text-secondary">{req.title}</p>
+                    <p className="font-medium text-foreground">{req.title}</p>
                     <span
                       className={cn(
                         "rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
@@ -251,12 +232,12 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
                       {statusLabel(req.status, role)}
                     </span>
                   </div>
-                  <p className="mt-1 text-sm text-neutral/60">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {role === "lawyer"
                       ? `${req.clientName} · ${formatWhen(req.createdAt)}`
                       : formatWhen(req.createdAt)}
                   </p>
-                  <p className="mt-2 line-clamp-3 text-sm text-neutral/65">
+                  <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">
                     {req.briefDescription}
                   </p>
                   {role === "client" ? (
@@ -265,17 +246,17 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
                         Sent to {req.requestedLawyerName}
                       </p>
                     ) : (
-                      <p className="mt-2 text-xs text-neutral/50">Open to any advocate</p>
+                      <p className="mt-2 text-xs text-muted-foreground">Open to any advocate</p>
                     )
                   ) : req.requestedLawyerId === lawyerUserId ? (
-                    <span className="mt-2 inline-block rounded bg-primary/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary">
+                    <span className="mt-2 inline-block rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-foreground">
                       Sent to you
                     </span>
                   ) : req.requestedLawyerId ? null : (
-                    <p className="mt-2 text-xs text-neutral/50">Open pool request</p>
+                    <p className="mt-2 text-xs text-muted-foreground">Open pool request</p>
                   )}
                   {req.specialConditions ? (
-                    <p className="mt-2 text-xs text-neutral/50">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       Note: {req.specialConditions}
                     </p>
                   ) : null}
@@ -286,7 +267,7 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
                 {role === "lawyer" && req.status === "pending" ? (
                   <>
                     <Button
-                      className="h-9 bg-secondary px-5 text-white hover:bg-secondary/90"
+                      className="h-9 px-5"
                       disabled={actionId != null}
                       onClick={() => void handleAccept(req.requestId)}
                     >
@@ -294,7 +275,7 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
                     </Button>
                     <Button
                       variant="outline"
-                      className="h-9 border-secondary/30 px-5 text-secondary hover:bg-tertiary"
+                      className="h-9 px-5"
                       disabled={actionId != null}
                       onClick={() => void handleDecline(req.requestId)}
                     >
@@ -309,7 +290,6 @@ export function CaseRequestsView({ role, lawyerUserId }: CaseRequestsViewProps) 
                     size="sm"
                     disabled={actionId != null}
                     onClick={() => void handleClientCancel(req.requestId)}
-                    className="border-black/10"
                   >
                     Cancel request
                   </Button>

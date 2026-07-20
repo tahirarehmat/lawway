@@ -62,7 +62,7 @@ export function ProfileDropdown({ email }: ProfileDropdownProps) {
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
-        className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-secondary transition hover:ring-2 hover:ring-primary/40 hover:cursor-pointer"
+        className="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground transition hover:ring-2 hover:ring-primary/40 hover:cursor-pointer"
         aria-label="Open profile menu"
         aria-expanded={open}
         aria-haspopup="menu"
@@ -73,15 +73,15 @@ export function ProfileDropdown({ email }: ProfileDropdownProps) {
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-50 mt-2 w-44 overflow-hidden rounded-md border border-black/10 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-card py-1.5 shadow-md"
         >
           <Link
             href="#"
             role="menuitem"
             onClick={() => setOpen(false)}
             className={cn(
-              "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-neutral/80 transition",
-              "hover:bg-tertiary hover:text-secondary",
+              "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground transition",
+              "hover:bg-muted hover:text-foreground",
             )}
           >
             <User className="size-4" />
@@ -92,8 +92,8 @@ export function ProfileDropdown({ email }: ProfileDropdownProps) {
             role="menuitem"
             onClick={handleLogout}
             className={cn(
-              "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-neutral/80 transition",
-              "hover:bg-tertiary hover:text-secondary hover:cursor-pointer",
+              "flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-muted-foreground transition",
+              "hover:bg-muted hover:text-foreground hover:cursor-pointer",
             )}
           >
             <LogOut className="size-4" />

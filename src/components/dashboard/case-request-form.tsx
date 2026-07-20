@@ -60,18 +60,18 @@ export function CaseRequestForm({
   }
 
   return (
-    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-5">
+    <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
       {requestedLawyerName ? (
-        <div className="rounded-lg border border-primary/25 bg-primary/10 px-4 py-3 text-sm text-secondary">
+        <div className="rounded-xl border border-primary/25 bg-primary/10 px-4 py-3 text-sm text-foreground">
           <p className="font-medium">Sending to {requestedLawyerName}</p>
-          <p className="mt-1 text-neutral/65">
+          <p className="mt-1 text-muted-foreground">
             This advocate will be notified and can accept your matter directly.
           </p>
         </div>
       ) : null}
 
       <div>
-        <label htmlFor="request-title" className="mb-1.5 block text-sm font-medium text-secondary">
+        <label htmlFor="request-title" className="mb-1.5 block text-sm font-medium text-foreground">
           Matter title
         </label>
         <input
@@ -80,7 +80,7 @@ export function CaseRequestForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Residential lease dispute"
-          className="w-full rounded-lg border border-black/10 bg-white px-4 py-2.5 text-sm text-secondary outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
           required
         />
       </div>
@@ -88,7 +88,7 @@ export function CaseRequestForm({
       <div>
         <label
           htmlFor="request-description"
-          className="mb-1.5 block text-sm font-medium text-secondary"
+          className="mb-1.5 block text-sm font-medium text-foreground"
         >
           Brief description
         </label>
@@ -98,7 +98,7 @@ export function CaseRequestForm({
           onChange={(e) => setBriefDescription(e.target.value)}
           placeholder="Describe your legal matter, key facts, and what you need help with."
           rows={5}
-          className="w-full resize-y rounded-lg border border-black/10 bg-white px-4 py-2.5 text-sm text-secondary outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+          className="w-full resize-y rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
           required
         />
       </div>
@@ -106,9 +106,9 @@ export function CaseRequestForm({
       <div>
         <label
           htmlFor="request-conditions"
-          className="mb-1.5 block text-sm font-medium text-secondary"
+          className="mb-1.5 block text-sm font-medium text-foreground"
         >
-          Special conditions <span className="font-normal text-neutral/50">(optional)</span>
+          Special conditions <span className="font-normal text-muted-foreground">(optional)</span>
         </label>
         <textarea
           id="request-conditions"
@@ -116,34 +116,25 @@ export function CaseRequestForm({
           onChange={(e) => setSpecialConditions(e.target.value)}
           placeholder="Timeline constraints, preferred communication, or other notes."
           rows={3}
-          className="w-full resize-y rounded-lg border border-black/10 bg-white px-4 py-2.5 text-sm text-secondary outline-none transition focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+          className="w-full resize-y rounded-xl border border-border bg-card px-3.5 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-ring/30"
         />
       </div>
 
       {error ? (
-        <p className="text-sm text-rose-700" role="alert">
+        <p className="text-sm text-destructive" role="alert">
           {error}
         </p>
       ) : null}
 
       <div className="flex flex-wrap gap-3 pt-2">
-        <Button
-          type="submit"
-          disabled={submitting}
-          className="bg-secondary text-white hover:bg-secondary/90"
-        >
+        <Button type="submit" disabled={submitting}>
           {submitting
             ? "Submitting…"
             : requestedLawyerName
               ? `Send to ${requestedLawyerName}`
               : "Submit request"}
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          className="border-black/10 text-secondary"
-        >
+        <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancel
         </Button>
       </div>

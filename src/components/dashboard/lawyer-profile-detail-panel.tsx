@@ -1,22 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Award,
   Briefcase,
   ChevronLeft,
   MapPin,
-  MessageCircle,
   Phone,
   Scale,
   X,
 } from "lucide-react";
 import type { LawyerSearchResult } from "@/lib/lawyers";
 import { lawyerBadge, lawyerInitials } from "@/lib/lawyers";
-import { Button } from "@/components/ui/button";
+import { LawyerContactActions } from "@/components/dashboard/lawyer-contact-actions";
 import { cn } from "@/lib/utils";
 
 type LawyerProfileDetailPanelProps = {
@@ -34,7 +31,6 @@ export function LawyerProfileDetailPanel({
   onClose,
 }: LawyerProfileDetailPanelProps) {
   const badge = lawyerBadge(lawyer.experienceYears);
-  const router = useRouter();
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -57,17 +53,17 @@ export function LawyerProfileDetailPanel({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-secondary/40 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-foreground/40 backdrop-blur-[2px]"
         onClick={onClose}
         aria-label="Close profile"
       />
 
-      <aside className="relative flex h-full w-full max-w-lg flex-col border-l border-black/10 bg-[#FCF9F6] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-black/5 px-5 py-4">
+      <aside className="relative flex h-full w-full max-w-lg flex-col border-l border-border bg-background shadow-[0_12px_32px_rgba(28,25,23,0.08)]">
+        <div className="flex items-center justify-between border-b border-border px-6 py-4">
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral/70 transition hover:text-secondary"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition hover:text-foreground"
           >
             <ChevronLeft className="size-4" aria-hidden />
             Back to results
@@ -75,17 +71,17 @@ export function LawyerProfileDetailPanel({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-neutral/50 transition hover:bg-black/5 hover:text-secondary"
+            className="rounded-[10px] p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
             aria-label="Close"
           >
             <X className="size-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-6">
+        <div className="flex-1 overflow-y-auto px-6 py-6">
           <div className="flex flex-col items-center text-center">
             {lawyer.profilePhotoUrl ? (
-              <div className="relative size-24 overflow-hidden rounded-full border-2 border-primary/30">
+              <div className="relative size-24 overflow-hidden rounded-full border border-border">
                 <Image
                   src={lawyer.profilePhotoUrl}
                   alt=""
@@ -95,7 +91,7 @@ export function LawyerProfileDetailPanel({
                 />
               </div>
             ) : (
-              <div className="flex size-24 items-center justify-center rounded-full bg-secondary font-serif text-2xl font-medium text-primary">
+              <div className="flex size-24 items-center justify-center rounded-full bg-muted text-2xl font-semibold text-foreground">
                 {lawyerInitials(lawyer.fullName)}
               </div>
             )}
@@ -109,11 +105,11 @@ export function LawyerProfileDetailPanel({
             </span>
             <h2
               id="lawyer-profile-title"
-              className="mt-3 font-serif text-2xl font-medium text-secondary"
+              className="mt-3 text-2xl font-semibold tracking-tight text-foreground"
             >
               {lawyer.fullName}
             </h2>
-            <p className="mt-1 text-sm text-primary">{lawyer.specialization}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{lawyer.specialization}</p>
           </div>
 
           <div className="mt-8 space-y-4">
@@ -132,44 +128,20 @@ export function LawyerProfileDetailPanel({
             <DetailRow icon={Phone} label="Phone" value={lawyer.phone} />
           </div>
 
-          <div className="mt-8 rounded-xl border border-black/5 bg-white p-5">
-            <div className="flex items-center gap-2 text-secondary">
-              <Award className="size-4 text-primary" aria-hidden />
+          <div className="mt-8 rounded-2xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 text-foreground">
+              <Award className="size-4 text-muted-foreground" aria-hidden />
               <h3 className="text-sm font-semibold">About</h3>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-neutral/75">
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {lawyer.bio?.trim() ||
                 "This advocate has not added a biography yet. You can still request a consultation through Lawway."}
             </p>
           </div>
         </div>
 
-        <div className="flex gap-3 border-t border-black/5 bg-white px-5 py-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11 flex-1 gap-2 border-black/10 text-secondary"
-            onClick={() => {
-              onClose();
-              router.push(
-                `/dashboard/tickets?lawyerId=${encodeURIComponent(lawyer.userId)}`,
-              );
-            }}
-          >
-            <MessageCircle className="size-4" aria-hidden />
-            Chat
-          </Button>
-          <Link
-            href={`/dashboard/requests/new?${new URLSearchParams({
-              title: "Consultation request",
-              lawyerId: lawyer.userId,
-              lawyerName: lawyer.fullName,
-            }).toString()}`}
-            onClick={onClose}
-            className="inline-flex h-11 flex-1 items-center justify-center rounded-lg bg-secondary text-sm font-medium text-white transition hover:bg-secondary/90"
-          >
-            Book consultation
-          </Link>
+        <div className="border-t border-border bg-card px-6 py-4">
+          <LawyerContactActions lawyer={lawyer} onNavigateAway={onClose} />
         </div>
       </aside>
     </div>
@@ -186,15 +158,15 @@ function DetailRow({
   value: string;
 }) {
   return (
-    <div className="flex gap-3 rounded-xl border border-black/5 bg-white px-4 py-3.5">
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+    <div className="flex gap-3 rounded-xl border border-border bg-card px-4 py-3.5">
+      <div className="dashboard-icon-wrap size-9 shrink-0">
         <Icon className="size-4" aria-hidden />
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] font-medium tracking-wide text-neutral/45 uppercase">
+        <p className="text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
           {label}
         </p>
-        <p className="mt-0.5 text-sm text-secondary">{value}</p>
+        <p className="mt-0.5 text-sm text-foreground">{value}</p>
       </div>
     </div>
   );

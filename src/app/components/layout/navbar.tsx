@@ -17,29 +17,29 @@ export function Navbar({
   ticketsLinkLabel = "Support",
 }: NavbarProps) {
   return (
-    <header className="flex shrink-0 items-center justify-end border-b border-[#523d39] bg-[#3e2723] px-4 py-3 sm:px-8">
-      <div className="flex items-center gap-3 sm:gap-4">
+    <header className="flex h-16 shrink-0 items-center justify-end border-b border-border bg-card px-4 sm:px-8">
+      <div className="flex items-center gap-2 sm:gap-3">
         {showSupport && (
           <Link
             href="/dashboard/tickets"
-            className="hidden text-sm text-white/70 transition hover:text-white sm:block"
+            className="hidden rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground sm:block"
           >
             {ticketsLinkLabel}
           </Link>
         )}
         <button
           type="button"
-          className="text-white/70 transition hover:text-white"
+          className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
           aria-label="Notifications"
         >
-          <Bell className="size-5" />
+          <Bell className="size-[1.15rem]" />
         </button>
         <button
           type="button"
-          className="text-white/70 transition hover:text-white"
+          className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
           aria-label="Settings"
         >
-          <Settings className="size-5" />
+          <Settings className="size-[1.15rem]" />
         </button>
         <ProfileDropdown email={email} />
       </div>

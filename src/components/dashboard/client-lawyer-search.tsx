@@ -17,17 +17,13 @@ import { LawyerSearchResultCard } from "@/components/dashboard/lawyer-search-res
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type ClientLawyerSearchProps = {
-  showHeading?: boolean;
-};
-
 const EMPTY_FILTERS: LawyerSearchFilterValues = {
   province: "",
   experience: "",
   specialization: "",
 };
 
-export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchProps) {
+export function ClientLawyerSearch() {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<LawyerSearchFilterValues>(EMPTY_FILTERS);
   const [lawyers, setLawyers] = useState<LawyerSearchResult[]>([]);
@@ -125,40 +121,25 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
 
   return (
     <section className="mx-auto w-full">
-      {showHeading ? (
-        <>
-          <h1 className="font-serif text-3xl font-medium tracking-tight text-secondary sm:text-4xl">
-            Find a lawyer
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm text-neutral/70 sm:text-base">
-            Browse all advocates on Lawway. Search by name or filter by location,
-            experience, and type — 10 profiles per page.
-          </p>
-        </>
-      ) : null}
-
       <form
         onSubmit={handleSearch}
-        className={cn(
-          "flex flex-col gap-3 sm:flex-row sm:items-stretch",
-          showHeading ? "mt-6" : "mt-0",
-        )}
+        className="mt-0 flex flex-col gap-3 sm:flex-row sm:items-stretch"
       >
-        <div className="relative flex flex-1 items-center rounded-2xl border border-black/5 bg-white p-2 shadow-sm">
-          <Search className="absolute left-5 size-4 text-neutral/40" aria-hidden />
+        <div className="relative flex flex-1 items-center rounded-xl border border-border bg-card shadow-xs">
+          <Search className="absolute left-3.5 size-4 text-muted-foreground" aria-hidden />
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Attorney name (optional)"
-            className="w-full border-none bg-transparent py-3 pr-4 pl-11 text-sm outline-none placeholder:text-neutral/40 focus:ring-0"
+            className="w-full rounded-xl border-none bg-transparent py-2.5 pr-4 pl-11 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:ring-0"
             aria-label="Search by attorney name"
           />
         </div>
         <Button
           type="submit"
           disabled={searching}
-          className="h-auto shrink-0 rounded-2xl bg-secondary px-8 py-3 text-white hover:bg-secondary/90 sm:min-w-[7.5rem]"
+          className="h-auto shrink-0 px-8 py-3 sm:min-w-[7.5rem]"
         >
           {searching ? (
             <>
@@ -182,31 +163,31 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
       />
 
       {error ? (
-        <p className="mt-3 text-sm text-rose-600" role="alert">
+        <p className="mt-3 text-sm text-destructive" role="alert">
           {error}
         </p>
       ) : null}
 
       <div className="mt-8">
         {searching && !hasLoaded ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-black/10 bg-white/60 py-16 text-sm text-neutral/60">
+          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-border bg-muted py-16 text-sm text-muted-foreground">
             <Loader2 className="size-6 animate-spin text-primary" aria-hidden />
             Loading lawyers…
           </div>
         ) : hasLoaded && lawyers.length === 0 ? (
-          <div className="rounded-2xl border border-black/5 bg-white px-6 py-14 text-center shadow-sm">
-            <p className="font-medium text-secondary">No lawyers found</p>
-            <p className="mt-2 text-sm text-neutral/60">
+          <div className="rounded-2xl border border-border bg-card px-6 py-16 text-center shadow-xs">
+            <p className="font-medium text-foreground">No lawyers found</p>
+            <p className="mt-2 text-sm text-muted-foreground">
               Try different filters or a broader search.
             </p>
           </div>
         ) : hasLoaded ? (
           <>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 px-1">
-              <p className="text-sm font-medium text-secondary">
+              <p className="text-sm font-medium text-foreground">
                 {total} advocate{total === 1 ? "" : "s"}
                 {total > 0 ? (
-                  <span className="font-normal text-neutral/55">
+                  <span className="font-normal text-muted-foreground">
                     {" "}
                     · showing {rangeStart}–{rangeEnd}
                   </span>
@@ -221,9 +202,12 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
               </button>
             </div>
 
-            <ul className="flex flex-col gap-3" role="list">
+            <ul
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              role="list"
+            >
               {lawyers.map((lawyer) => (
-                <li key={lawyer.userId}>
+                <li key={lawyer.userId} className="min-w-0">
                   <LawyerSearchResultCard
                     lawyer={lawyer}
                     onSelect={() => setSelectedLawyer(lawyer)}
@@ -243,7 +227,7 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
                   size="sm"
                   disabled={page <= 1 || searching}
                   onClick={() => goToPage(page - 1)}
-                  className="gap-1 border-black/10"
+                  className="gap-1"
                 >
                   <ChevronLeft className="size-4" aria-hidden />
                   Previous
@@ -263,17 +247,17 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
                       return (
                         <span key={p} className="flex items-center gap-1">
                           {showEllipsis ? (
-                            <span className="px-1 text-neutral/40">…</span>
+                            <span className="px-1 text-muted-foreground">…</span>
                           ) : null}
                           <button
                             type="button"
                             disabled={searching}
                             onClick={() => goToPage(p)}
                             className={cn(
-                              "min-w-9 rounded-lg px-2 py-1.5 text-sm font-medium transition",
+                              "min-w-9 rounded-[10px] px-2 py-1.5 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
                               p === page
-                                ? "bg-secondary text-white"
-                                : "text-neutral/70 hover:bg-black/5",
+                                ? "bg-foreground text-background"
+                                : "text-muted-foreground hover:bg-muted",
                             )}
                             aria-current={p === page ? "page" : undefined}
                           >
@@ -290,7 +274,7 @@ export function ClientLawyerSearch({ showHeading = true }: ClientLawyerSearchPro
                   size="sm"
                   disabled={page >= totalPages || searching}
                   onClick={() => goToPage(page + 1)}
-                  className="gap-1 border-black/10"
+                  className="gap-1"
                 >
                   Next
                   <ChevronRight className="size-4" aria-hidden />

@@ -41,7 +41,7 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
     <>
       {sidebarOpen && !isCompact && (
         <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm transition-opacity duration-300 md:hidden"
+          className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm transition-opacity duration-300 md:hidden"
           onClick={onSidebarClose}
           aria-hidden
         />
@@ -49,53 +49,49 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
 
       <div
         className={`
-        flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-[#d4af37]/25 bg-[#1a0f0e] shadow-2xl shadow-[#d4af37]/10 backdrop-blur-xl
+        flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-border bg-card
         ${isCompact ? (showChatView ? "hidden" : "w-full max-w-full") : "fixed z-50 transition-all duration-500 ease-out md:relative md:z-auto"}
         ${!isCompact && (sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0")}
         h-full
-        before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-b before:from-[#d4af37]/10 before:to-transparent
       `}
       >
-        <div className="relative border-b border-[#d4af37]/25 bg-gradient-to-br from-[#241816]/90 via-[#1a0f0e]/95 to-[#140c0a]/95 px-4 py-6 backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#d4af37]/5 to-transparent opacity-60" />
-          <div className="relative flex items-center justify-between">
+        <div className="border-b border-border bg-card px-4 py-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {!isCompact && (
                 <button
                   type="button"
                   onClick={onSidebarClose}
-                  className="group cursor-pointer p-2.5 text-white/60 transition-colors hover:text-[#d4af37] md:hidden"
+                  className="group cursor-pointer rounded-full p-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
                   title="Close list"
                 >
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />
                 </button>
               )}
               <div>
-                <h2 className="text-xl font-semibold tracking-tight text-white">
+                <h2 className="text-xl font-semibold tracking-tight text-foreground">
                   Legal messages
                 </h2>
-                <p className="text-[11px] text-white/40">Per advocate — pick a thread below</p>
+                <p className="text-[11px] text-muted-foreground">Per advocate — pick a thread below</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={onNavigateBack}
-                className="group relative cursor-pointer overflow-hidden rounded-md border border-[#d4af37]/50 bg-gradient-to-r from-[#d4af37]/15 to-[#d4af37]/5 p-1.5 shadow-sm transition-all hover:border-[#d4af37] hover:shadow-[#d4af37]/25"
+                className="cursor-pointer rounded-full border border-border p-1.5 text-muted-foreground shadow-xs transition-all hover:bg-muted hover:text-foreground"
                 title="Dashboard home"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#d4af37]/0 to-[#d4af37]/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                <Home className="relative h-4 w-4 text-[#d4af37] transition-colors group-hover:text-white" />
+                <Home className="h-4 w-4" />
               </button>
               {canCreateTicket && (
                 <button
                   type="button"
                   onClick={onCreateTicket}
-                  className="group relative cursor-pointer overflow-hidden rounded-md border border-[#d4af37]/50 bg-gradient-to-r from-[#d4af37]/15 to-[#d4af37]/5 px-2 py-1 shadow-sm transition-all hover:border-[#d4af37] hover:shadow-[#d4af37]/25"
+                  className="cursor-pointer rounded-[10px] bg-primary px-3 py-1.5 shadow-xs transition-all hover:bg-primary/90"
                   title="New message to your legal team"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#d4af37]/0 to-[#d4af37]/10 opacity-0 transition-opacity group-hover:opacity-100" />
-                  <span className="relative text-[11px] font-semibold tracking-wide text-[#d4af37] transition-colors group-hover:text-white">
+                  <span className="text-[11px] font-semibold tracking-wide text-primary-foreground">
                     New
                   </span>
                 </button>
@@ -104,7 +100,7 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-xl p-2.5 text-white/60 transition hover:scale-105 hover:bg-white/10 hover:text-white"
+                  className="rounded-full p-2.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -117,11 +113,11 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
           {tickets.length === 0 && ticketsLoaded ? (
             <div className="flex flex-1 flex-col items-center justify-center p-6">
               <div className="w-full px-4 text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#3e2723] to-[#d4af37] shadow-lg shadow-[#d4af37]/25">
-                  <MessageCircle className="h-6 w-6 text-white" />
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                  <MessageCircle className="h-6 w-6 text-primary" />
                 </div>
-                <p className="text-sm text-white/50">No messages yet</p>
-                <p className="mt-1 text-xs text-white/35">
+                <p className="text-sm text-foreground">No messages yet</p>
+                <p className="mt-1 text-xs text-muted-foreground">
                   Start a conversation with your legal team
                 </p>
               </div>
@@ -138,34 +134,34 @@ const UserTicketSidebar: React.FC<UserTicketSidebarProps> = ({
                     if (e.key === "Enter" || e.key === " ") onTicketSelect(ticket);
                   }}
                   style={{ animationDelay: `${index * 50}ms` }}
-                  className={`group relative w-full max-w-full cursor-pointer overflow-hidden border-b border-[#d4af37]/15 p-4 transition-all duration-300 animate-in fade-in slide-in-from-left-2 ${
+                  className={`group relative w-full max-w-full cursor-pointer overflow-hidden border-b border-border p-4 transition-all duration-300 animate-in fade-in slide-in-from-left-2 ${
                     selectedTicket?.id === ticket.id
-                      ? "bg-gradient-to-r from-[#3e2723]/80 to-[#d4af37]/25"
-                      : "bg-transparent hover:bg-[#2a1815]/50"
+                      ? "bg-primary/10"
+                      : "bg-transparent hover:bg-muted"
                   }`}
                 >
                   <div className="relative max-w-full min-w-0">
                     <div className="mb-2 flex w-full min-w-0 items-start justify-between gap-2">
-                      <h3 className="min-w-0 flex-1 truncate text-sm font-semibold text-white transition-colors group-hover:text-[#d4af37]">
+                      <h3 className="min-w-0 flex-1 truncate text-sm font-semibold tracking-tight text-foreground">
                         {ticket.subject}
                       </h3>
                       {ticket.unreadCount > 0 && (
-                        <span className="flex h-[22px] min-w-[22px] shrink-0 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-[#d4af37] to-[#3e2723] px-2 text-xs font-bold text-white shadow-lg shadow-[#d4af37]/40">
+                        <span className="flex h-[22px] min-w-[22px] shrink-0 items-center justify-center rounded-full bg-primary px-2 text-xs font-bold text-primary-foreground">
                           {ticket.unreadCount}
                         </span>
                       )}
                     </div>
                     {ticket.lawyerName ? (
-                      <p className="mb-2 truncate text-[11px] font-medium text-[#d4af37]/90">
+                      <p className="mb-2 truncate text-[11px] font-medium text-muted-foreground">
                         {ticket.lawyerName}
                       </p>
                     ) : null}
                     <div className="flex w-full min-w-0 items-center justify-between gap-2 text-xs">
-                      <span className="min-w-0 truncate font-medium text-white/50">
+                      <span className="min-w-0 truncate font-medium text-muted-foreground">
                         {formatTicketDate(ticket.recentActivity)}
                       </span>
                       <span
-                        className={`shrink-0 rounded-lg px-2.5 py-1 text-[10px] font-semibold capitalize ${getStatusColor(ticket.status)} bg-current/10`}
+                        className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${getStatusColor(ticket.status)} bg-current/10`}
                       >
                         {ticket.status}
                       </span>

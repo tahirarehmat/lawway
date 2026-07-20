@@ -2,8 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { FileText, Home, Menu, MessageCircle, Send, X } from "lucide-react";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import "@cyntler/react-doc-viewer/dist/index.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -26,7 +24,7 @@ const linkifyHtml = (html: string): string => {
   const urlRe = /(https?:\/\/[^\s<>"']+[^\s<>"'.,;:!?)\]])/g;
   const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
   const linkAttrs =
-    'class="text-[#d4af37] underline hover:opacity-80 break-all" target="_blank" rel="noopener noreferrer"';
+    'class="text-primary underline hover:opacity-80 break-all" target="_blank" rel="noopener noreferrer"';
   const parts = html.split(/(<a\b[^>]*>[\s\S]*?<\/a>)/gi);
   return parts
     .map((seg) => {
@@ -52,27 +50,27 @@ const MessageBody: React.FC<{ content: string; className?: string }> = ({
   if (isHtml) {
     return (
       <div
-        className={`ckeditor-message-content prose prose-invert prose-sm mb-1 max-w-none text-sm text-[#f4ede4] [&_*]:text-[#ebe3d9] [&_a]:text-[#d4af37] [&_a]:underline ${className || ""}`}
+        className={`ckeditor-message-content prose prose-sm mb-1 max-w-none text-sm text-foreground [&_*]:text-foreground [&_a]:text-primary [&_a]:underline ${className || ""}`}
         dangerouslySetInnerHTML={{ __html: linkifyHtml(content) }}
       />
     );
   }
   return (
     <div
-      className={`prose prose-invert prose-sm mb-1 max-w-none text-sm text-[#f4ede4] [&_blockquote]:text-white/85 [&_code]:text-[#f4ede4] ${className || ""}`}
+      className={`prose prose-sm mb-1 max-w-none text-sm text-foreground [&_blockquote]:text-muted-foreground [&_code]:text-foreground ${className || ""}`}
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          p: ({ children }) => <span className="text-[#f4ede4]">{children}</span>,
+          p: ({ children }) => <span className="text-foreground">{children}</span>,
           strong: ({ children }) => (
-            <strong className="font-semibold text-white">{children}</strong>
+            <strong className="font-semibold text-foreground">{children}</strong>
           ),
           li: ({ children }) => (
-            <li className="text-[#ebe3d9]">{children}</li>
+            <li className="text-foreground">{children}</li>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-[#d4af37]/40 pl-2 text-[#ebe3d9] italic">
+            <blockquote className="border-l-2 border-primary/40 pl-2 text-muted-foreground">
               {children}
             </blockquote>
           ),
@@ -242,15 +240,15 @@ export default function LawyerTicketDashboard({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "open":
-        return "text-[#d4af37]";
+        return "text-primary";
       case "in-progress":
-        return "text-amber-300";
+        return "text-primary";
       case "resolved":
-        return "text-emerald-400";
+        return "text-muted-foreground";
       case "closed":
-        return "text-white/40";
+        return "text-muted-foreground";
       default:
-        return "text-white/40";
+        return "text-muted-foreground";
     }
   };
 
@@ -309,10 +307,10 @@ export default function LawyerTicketDashboard({
   const isPdfDocument = (url: string) => /\.pdf$/i.test(url) || url.includes("pdf");
 
   return (
-    <div className="flex h-[var(--ticket-h,100dvh)] w-full overflow-hidden bg-gradient-to-br from-[#1a0f0e] via-[#140c0a] to-[#1a0f0e]">
+    <div className="flex h-[var(--ticket-h,100dvh)] w-full overflow-hidden bg-background">
       {sidebarOpen && !isCompact && (
         <div
-          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden
         />
@@ -320,22 +318,22 @@ export default function LawyerTicketDashboard({
 
       <div
         className={`
-        flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-[#d4af37]/25 bg-[#1a0f0e] shadow-2xl
+        flex w-80 max-w-[85vw] flex-col overflow-hidden border-r border-border bg-card
         ${isCompact ? (showChatView ? "hidden" : "w-full max-w-full") : "fixed z-50 transition-transform duration-300 ease-out md:relative md:z-auto md:translate-x-0"}
         ${!isCompact && (sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0")}
         h-full
       `}
       >
-        <div className="relative border-b border-[#d4af37]/25 bg-gradient-to-br from-[#241816]/90 via-[#1a0f0e]/95 to-[#140c0a]/95 px-4 py-5">
+        <div className="border-b border-border bg-card px-4 py-5">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <h2 className="text-lg font-semibold text-white">Client messages</h2>
-              <p className="text-[11px] text-white/40">Threads opened with you</p>
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">Client messages</h2>
+              <p className="text-[11px] text-muted-foreground">Threads opened with you</p>
             </div>
             <button
               type="button"
               onClick={() => router.push("/dashboard")}
-              className="rounded-md border border-[#d4af37]/50 bg-[#d4af37]/10 p-1.5 text-[#d4af37] hover:bg-[#d4af37]/20"
+              className="rounded-full border border-border p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               title="Dashboard home"
             >
               <Home className="h-4 w-4" />
@@ -345,8 +343,8 @@ export default function LawyerTicketDashboard({
         <div className="scrollbar-themed min-h-0 flex-1 overflow-y-auto">
           {ticketsLoaded && tickets.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
-              <MessageCircle className="h-10 w-10 text-[#d4af37]/40" />
-              <p className="mt-3 text-sm text-white/50">No client conversations yet</p>
+              <MessageCircle className="h-10 w-10 text-muted-foreground" />
+              <p className="mt-3 text-sm text-muted-foreground">No client conversations yet</p>
             </div>
           ) : ticketsLoaded ? (
             tickets.map((ticket) => (
@@ -354,26 +352,26 @@ export default function LawyerTicketDashboard({
                 key={`${ticket.clientUserId}-${ticket.id}`}
                 type="button"
                 onClick={() => handleTicketSelect(ticket)}
-                className={`w-full border-b border-[#d4af37]/15 p-4 text-left transition-colors ${
+                className={`w-full border-b border-border p-4 text-left transition-colors ${
                   selectedTicket?.ticketId === ticket.ticketId &&
                   selectedTicket?.clientUserId === ticket.clientUserId
-                    ? "bg-gradient-to-r from-[#3e2723]/80 to-[#d4af37]/25"
-                    : "hover:bg-[#2a1815]/50"
+                    ? "bg-primary/10"
+                    : "hover:bg-muted"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="line-clamp-2 text-sm font-semibold text-white">{ticket.subject}</h3>
+                  <h3 className="line-clamp-2 text-sm font-semibold tracking-tight text-foreground">{ticket.subject}</h3>
                   {(ticket.adminUnreadCount ?? 0) > 0 && (
-                    <span className="flex h-[22px] min-w-[22px] shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#d4af37] to-[#3e2723] px-2 text-xs font-bold text-white">
+                    <span className="flex h-[22px] min-w-[22px] shrink-0 items-center justify-center rounded-full bg-primary px-2 text-xs font-bold text-primary-foreground">
                       {ticket.adminUnreadCount}
                     </span>
                   )}
                 </div>
-                <p className="mt-1 truncate text-[11px] text-[#d4af37]/85">{ticket.userUid}</p>
+                <p className="mt-1 truncate text-[11px] text-muted-foreground">{ticket.userUid}</p>
                 <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                  <span className="text-white/45">{formatTicketDate(ticket.recentActivity)}</span>
+                  <span className="text-muted-foreground">{formatTicketDate(ticket.recentActivity)}</span>
                   <span
-                    className={`rounded-lg px-2 py-0.5 text-[10px] font-semibold capitalize ${getStatusColor(ticket.status)} bg-current/10`}
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold capitalize ${getStatusColor(ticket.status)} bg-current/10`}
                   >
                     {ticket.status}
                   </span>
@@ -381,24 +379,24 @@ export default function LawyerTicketDashboard({
               </button>
             ))
           ) : (
-            <p className="p-6 text-center text-sm text-white/45">Loading…</p>
+            <p className="p-6 text-center text-sm text-muted-foreground">Loading…</p>
           )}
         </div>
       </div>
 
       <div
-        className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#1a0f0e] ${isCompact && !showChatView ? "hidden" : ""}`}
+        className={`relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-background ${isCompact && !showChatView ? "hidden" : ""}`}
       >
         {!ticketsLoaded ? (
-          <div className="flex flex-1 items-center justify-center text-white/50">Loading…</div>
+          <div className="flex flex-1 items-center justify-center text-muted-foreground">Loading…</div>
         ) : selectedTicket ? (
           <>
-            <div className="z-30 shrink-0 border-b border-[#d4af37]/20 bg-[#1a0f0e]">
+            <div className="z-30 shrink-0 border-b border-border bg-card">
               <div className="flex items-center gap-2 px-3 py-2.5 md:px-6">
                 {isCompact ? (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg p-2 text-white/60 hover:bg-white/5"
+                    className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                     onClick={() => setShowChatView(false)}
                   >
                     <Menu className="h-5 w-5" />
@@ -406,20 +404,20 @@ export default function LawyerTicketDashboard({
                 ) : (
                   <button
                     type="button"
-                    className="shrink-0 rounded-lg p-2 text-white/60 hover:bg-white/5 md:hidden"
+                    className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
                     onClick={() => setSidebarOpen(true)}
                   >
                     <Menu className="h-5 w-5" />
                   </button>
                 )}
                 <div className="min-w-0 flex-1">
-                  <h1 className="truncate text-base font-semibold text-white md:text-lg">
+                  <h1 className="truncate text-base font-semibold tracking-tight text-foreground md:text-lg">
                     {selectedTicket.subject}
                   </h1>
-                  <p className="truncate text-xs text-[#d4af37]/80">{selectedTicket.userUid}</p>
+                  <p className="truncate text-xs text-muted-foreground">{selectedTicket.userUid}</p>
                 </div>
                 <span
-                  className={`shrink-0 rounded-md border border-[#d4af37]/30 px-2 py-0.5 text-[10px] capitalize md:text-xs ${getStatusColor(selectedTicket.status)}`}
+                  className={`shrink-0 rounded-full border border-border px-2.5 py-0.5 text-[10px] capitalize md:text-xs ${getStatusColor(selectedTicket.status)}`}
                 >
                   {selectedTicket.status}
                 </span>
@@ -428,30 +426,30 @@ export default function LawyerTicketDashboard({
 
             <div className="scrollbar-themed min-h-0 flex-1 overflow-y-auto p-3 md:p-6">
               {messagesLoading && messages.length === 0 ? (
-                <p className="text-center text-white/40">Loading messages…</p>
+                <p className="text-center text-muted-foreground">Loading messages…</p>
               ) : (
                 <div className="space-y-6">
                   {Object.entries(groupMessagesByDate(messages as { timestamp?: unknown }[])).map(
                     ([label, list]) => (
                       <div key={label} className="space-y-3">
                         <div className="flex justify-center">
-                          <span className="rounded-full border border-[#d4af37]/25 bg-[#2a1815]/80 px-4 py-1 text-xs text-white/60">
+                          <span className="rounded-full border border-border bg-muted px-4 py-1 text-xs text-muted-foreground">
                             {label}
                           </span>
                         </div>
-                        {(list as object[]).map((message: Record<string, unknown>) => (
+                        {(list as Record<string, unknown>[]).map((message: Record<string, unknown>) => (
                           <div
                             key={(message as { id: string }).id}
                             className={`flex items-start ${message.senderType === "user" ? "justify-end" : "justify-start"} gap-2`}
                           >
                             <div
-                              className={`relative max-w-[80%] rounded-2xl border p-3 text-[#f4ede4] [&_img]:rounded ${
+                              className={`relative max-w-[80%] rounded-2xl border p-3.5 text-foreground [&_img]:rounded-xl ${
                                 message.senderType === "user"
-                                  ? "border-[#3e2723]/60 bg-gradient-to-br from-[#3e2723]/40 to-[#1a0f0e]/80"
-                                  : "border-[#d4af37]/25 bg-[#2a1815]/70"
+                                  ? "border-border bg-muted"
+                                  : "border-transparent bg-primary/15"
                               }`}
                             >
-                              {message.type === "image" && message.imageUrl && (
+                              {message.type === "image" && Boolean(message.imageUrl) && (
                                 <img
                                   src={String(message.imageUrl)}
                                   alt=""
@@ -459,13 +457,13 @@ export default function LawyerTicketDashboard({
                                   onClick={() => setSelectedImage(String(message.imageUrl))}
                                 />
                               )}
-                              {message.type === "document" && message.imageUrl && (
+                              {message.type === "document" && Boolean(message.imageUrl) && (
                                 <button
                                   type="button"
-                                  className="mb-2 flex w-full items-center gap-2 rounded-lg border border-[#d4af37]/30 bg-[#d4af37]/10 p-2 text-left text-sm text-white"
+                                  className="mb-2 flex w-full items-center gap-2 rounded-xl border border-border bg-card p-2.5 text-left text-sm text-foreground hover:bg-muted"
                                   onClick={() => setSelectedDocument(String(message.imageUrl))}
                                 >
-                                  <FileText className="h-6 w-6 shrink-0 text-[#d4af37]" />
+                                  <FileText className="h-6 w-6 shrink-0 text-primary" />
                                   <span className="truncate">Open document</span>
                                 </button>
                               )}
@@ -480,10 +478,10 @@ export default function LawyerTicketDashboard({
                                     onClick={() => setSelectedImage(u)}
                                   />
                                 ))}
-                              {(!message.type || message.type === "text") && message.message && (
+                              {(!message.type || message.type === "text") && Boolean(message.message) && (
                                 <MessageBody content={String(message.message)} />
                               )}
-                              <div className="mt-1 text-right text-[11px] text-white/55">
+                              <div className="mt-1 text-right text-xs text-muted-foreground">
                                 {formatTime(message.timestamp as { seconds?: number; toDate?: () => Date })}
                               </div>
                             </div>
@@ -500,7 +498,7 @@ export default function LawyerTicketDashboard({
             {selectedTicket.status !== "closed" ? (
               <form
                 onSubmit={handleSendMessage}
-                className="shrink-0 border-t border-[#d4af37]/20 bg-[#1a0f0e]/95 p-3 backdrop-blur md:p-4"
+                className="shrink-0 border-t border-border bg-card p-3 md:p-4"
               >
                 <div className="flex items-end gap-2">
                   <textarea
@@ -508,27 +506,27 @@ export default function LawyerTicketDashboard({
                     onChange={(e) => setNewMessage(e.target.value)}
                     rows={1}
                     placeholder="Reply to your client…"
-                    className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-[#d4af37]/30 bg-[#140c0a]/80 px-3 py-2 text-sm text-white placeholder:text-white/35 focus:border-[#d4af37]/60 focus:outline-none"
+                    className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
                   />
                   <button
                     type="submit"
                     disabled={sending || !newMessage.trim()}
-                    className="shrink-0 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#3e2723] p-3 text-white disabled:opacity-40"
+                    className="shrink-0 rounded-[10px] bg-primary p-3 text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
                   >
                     <Send className="h-5 w-5" />
                   </button>
                 </div>
               </form>
             ) : (
-              <div className="shrink-0 border-t border-white/10 p-4 text-center text-sm text-white/50">
+              <div className="shrink-0 border-t border-border p-4 text-center text-sm text-muted-foreground">
                 This thread is closed.
               </div>
             )}
           </>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-            <MessageCircle className="h-10 w-10 text-[#d4af37]/60" />
-            <p className="text-sm text-white/60">Select a conversation</p>
+            <MessageCircle className="h-10 w-10 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Select a conversation</p>
           </div>
         )}
       </div>
@@ -556,46 +554,45 @@ export default function LawyerTicketDashboard({
           role="presentation"
         >
           <div
-            className="relative flex h-[90vh] max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#d4af37]/30 bg-[#1a0f0e]"
+            className="relative flex h-[90vh] max-w-4xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-lg"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal
           >
-            <div className="flex items-center justify-between border-b border-[#d4af37]/30 p-3">
-              <span className="font-medium text-white">Document</span>
+            <div className="flex items-center justify-between border-b border-border p-3">
+              <span className="font-semibold tracking-tight text-foreground">Document</span>
               <div className="flex gap-2">
                 <a
                   href={selectedDocument}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg bg-[#d4af37] px-3 py-1.5 text-sm font-medium text-[#3e2723]"
+                  className="rounded-[10px] bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Open
                 </a>
                 <button
                   type="button"
-                  className="rounded-lg p-2 text-white/70 hover:bg-white/10"
+                  className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                   onClick={() => setSelectedDocument(null)}
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
-            <div className="min-h-0 flex-1 overflow-auto bg-[#111]">
+            <div className="min-h-0 flex-1 overflow-auto bg-muted p-3">
               {isPdfDocument(selectedDocument) ? (
-                <DocViewer
-                  documents={[{ uri: selectedDocument }]}
-                  pluginRenderers={DocViewerRenderers}
-                  style={{ height: "100%", minHeight: 480 }}
-                  config={{ header: { disableHeader: true } }}
+                <iframe
+                  title="PDF document"
+                  src={selectedDocument}
+                  className="h-full min-h-[480px] w-full rounded-xl border border-border bg-white"
                 />
               ) : (
-                <div className="p-8 text-center text-white/60">
+                <div className="p-8 text-center text-muted-foreground">
                   <a
                     href={selectedDocument}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[#d4af37] underline"
+                    className="text-primary underline"
                   >
                     Download file
                   </a>

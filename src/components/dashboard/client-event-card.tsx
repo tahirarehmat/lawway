@@ -30,9 +30,9 @@ export function ClientEventCard({ event, selected, onSelect }: ClientEventCardPr
           <span className="text-[10px] font-semibold uppercase tracking-wide text-primary">
             {EVENT_TYPE_LABELS[event.eventType]}
           </span>
-          <p className="mt-1 font-medium text-secondary">{event.title}</p>
-          <p className="mt-1 text-xs text-neutral/55">{event.caseTitle}</p>
-          <p className="mt-1 text-xs text-neutral/50">{formatEventWhen(event.startsAt)}</p>
+          <p className="mt-1 font-medium text-foreground">{event.title}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{event.caseTitle}</p>
+          <p className="mt-1 text-xs text-muted-foreground">{formatEventWhen(event.startsAt)}</p>
         </span>
       </div>
     </button>

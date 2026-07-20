@@ -37,20 +37,20 @@ export function ClientEventDetailPanel({ event, onClose }: ClientEventDetailPane
     >
       <button
         type="button"
-        className="absolute inset-0 bg-secondary/40 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-foreground/20 backdrop-blur-[2px]"
         onClick={onClose}
         aria-label="Close"
       />
 
-      <aside className="relative flex h-full w-full max-w-md flex-col border-l border-black/10 bg-[#FCF9F6] shadow-2xl">
-        <div className="flex items-center justify-between border-b border-black/5 px-5 py-4">
+      <aside className="relative flex h-full w-full max-w-md flex-col border-l border-border bg-card shadow-lg">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">
             {EVENT_TYPE_LABELS[event.eventType]}
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-neutral/50 hover:bg-black/5"
+            className="rounded-[10px] p-2 text-muted-foreground hover:bg-muted"
             aria-label="Close panel"
           >
             <X className="size-5" />
@@ -58,45 +58,45 @@ export function ClientEventDetailPanel({ event, onClose }: ClientEventDetailPane
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-6">
-          <h2 id="event-detail-title" className="font-serif text-2xl font-medium text-secondary">
+          <h2 id="event-detail-title" className="text-2xl font-semibold tracking-tight text-foreground">
             {event.title}
           </h2>
-          <p className="mt-2 text-sm text-neutral/60">{event.caseTitle}</p>
-          <p className="mt-1 text-sm text-neutral/50">Counsel: {event.lawyerName}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{event.caseTitle}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Counsel: {event.lawyerName}</p>
 
           <dl className="mt-6 space-y-4 text-sm">
             <div>
-              <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral/45">
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 When
               </dt>
-              <dd className="mt-1 text-secondary">{formatEventWhen(event.startsAt)}</dd>
+              <dd className="mt-1 text-foreground">{formatEventWhen(event.startsAt)}</dd>
             </div>
             {event.location ? (
               <div>
-                <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral/45">
+                <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                   Location
                 </dt>
-                <dd className="mt-1 text-secondary">{event.location}</dd>
+                <dd className="mt-1 text-foreground">{event.location}</dd>
               </div>
             ) : null}
             <div>
-              <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral/45">
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 Status
               </dt>
-              <dd className="mt-1 text-secondary">{EVENT_STATUS_LABELS[event.status]}</dd>
+              <dd className="mt-1 text-foreground">{EVENT_STATUS_LABELS[event.status]}</dd>
             </div>
             <div>
-              <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral/45">
+              <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                 Priority
               </dt>
-              <dd className="mt-1 text-secondary">{EVENT_PRIORITY_LABELS[event.priority]}</dd>
+              <dd className="mt-1 text-foreground">{EVENT_PRIORITY_LABELS[event.priority]}</dd>
             </div>
             {event.description ? (
               <div>
-                <dt className="text-[11px] font-medium uppercase tracking-wide text-neutral/45">
+                <dt className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                   Details
                 </dt>
-                <dd className="mt-1 leading-relaxed text-neutral/75">{event.description}</dd>
+                <dd className="mt-1 leading-relaxed text-muted-foreground">{event.description}</dd>
               </div>
             ) : null}
           </dl>

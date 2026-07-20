@@ -72,7 +72,7 @@ export function CaseDetailView({
   }, [loadAll]);
 
   if (loadingDetail) {
-    return <p className="text-sm text-neutral/55">Loading case file…</p>;
+    return <p className="text-sm text-muted-foreground">Loading case file…</p>;
   }
 
   if (detailError || !caseDetail) {
@@ -80,12 +80,12 @@ export function CaseDetailView({
       <div>
         <Link
           href="/dashboard/cases"
-          className="inline-flex items-center gap-1 text-sm text-neutral/65 hover:text-secondary"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="size-4" />
           Back to cases
         </Link>
-        <p className="mt-6 text-sm text-rose-700">{detailError ?? "Case not found."}</p>
+        <p className="mt-6 text-sm text-red-700">{detailError ?? "Case not found."}</p>
         <Button type="button" variant="outline" className="mt-4" onClick={() => void loadDetail()}>
           <RefreshCw className="mr-2 size-4" aria-hidden />
           Try again
@@ -108,7 +108,7 @@ export function CaseDetailView({
     <div className="mx-auto max-w-6xl">
       <Link
         href="/dashboard/cases"
-        className="inline-flex items-center gap-1 text-sm text-neutral/65 hover:text-secondary"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="size-4" />
         Back to cases
@@ -116,13 +116,13 @@ export function CaseDetailView({
 
       <header className="mt-6 mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-[11px] font-medium tracking-[0.16em] text-neutral/45 uppercase">
+          <p className="text-[11px] font-medium tracking-[0.16em] text-muted-foreground uppercase">
             Case file
           </p>
-          <h1 className="mt-2 font-serif text-3xl font-medium tracking-tight text-secondary">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground">
             {caseDetail.title}
           </h1>
-          <p className="mt-2 text-sm text-neutral/65">
+          <p className="mt-2 text-sm text-muted-foreground">
             {role === "client"
               ? `Counsel: ${caseDetail.lawyerName}`
               : `Client: ${caseDetail.clientName}`}
@@ -155,13 +155,13 @@ export function CaseDetailView({
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <section className="dashboard-card p-6">
-            <h2 className="font-serif text-lg font-medium text-secondary">Overview</h2>
-            <p className="mt-3 text-sm leading-relaxed text-neutral/75">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Overview</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {caseDetail.briefDescription}
             </p>
             {caseDetail.specialConditions ? (
-              <p className="mt-4 text-sm text-neutral/60">
-                <span className="font-medium text-secondary">Special conditions: </span>
+              <p className="mt-4 text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">Special conditions: </span>
                 {caseDetail.specialConditions}
               </p>
             ) : null}
@@ -169,7 +169,7 @@ export function CaseDetailView({
 
           <section className="dashboard-card p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-serif text-lg font-medium text-secondary">Events</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">Events</h2>
               {role === "lawyer" ? (
                 <CreateCaseEventForm
                   caseId={caseId}
@@ -180,9 +180,9 @@ export function CaseDetailView({
               ) : null}
             </div>
             {loadingEvents ? (
-              <p className="mt-4 text-sm text-neutral/55">Loading events…</p>
+              <p className="mt-4 text-sm text-muted-foreground">Loading events…</p>
             ) : eventsError ? (
-              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <div className="mt-4 rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
                 {eventsError}
                 <button
                   type="button"
@@ -193,7 +193,7 @@ export function CaseDetailView({
                 </button>
               </div>
             ) : events.length === 0 ? (
-              <p className="mt-4 text-sm text-neutral/55">
+              <p className="mt-4 text-sm text-muted-foreground">
                 {role === "lawyer"
                   ? "No events yet. Use Add event to schedule hearings, deadlines, or notes."
                   : "No events scheduled yet."}
@@ -203,17 +203,17 @@ export function CaseDetailView({
                 {events.map((evt) => (
                   <li
                     key={evt.eventId}
-                    className="rounded-lg border border-black/5 bg-white/80 px-4 py-3"
+                    className="rounded-xl border border-border bg-card px-4 py-3"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-primary">
                       {EVENT_TYPE_LABELS[evt.eventType]}
                     </p>
-                    <p className="mt-1 font-medium text-secondary">{evt.title}</p>
+                    <p className="mt-1 font-medium text-foreground">{evt.title}</p>
                     {evt.description ? (
-                      <p className="mt-1 text-sm text-neutral/60">{evt.description}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{evt.description}</p>
                     ) : null}
                     {evt.startsAt ? (
-                      <p className="mt-1 text-sm text-neutral/55">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {formatEventWhen(evt.startsAt)}
                         {evt.location ? ` · ${evt.location}` : ""}
                       </p>
@@ -227,8 +227,8 @@ export function CaseDetailView({
 
         <aside className="space-y-6">
           <section className="dashboard-card p-6">
-            <h2 className="font-serif text-lg font-medium text-secondary">Case progress</h2>
-            <p className="mt-1 text-xs text-neutral/55">
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">Case progress</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
               Stages from intake through resolution.
             </p>
             <div className="mt-6">
