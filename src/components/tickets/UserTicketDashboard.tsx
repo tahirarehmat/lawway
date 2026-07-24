@@ -8,9 +8,11 @@ import {
   Home,
   Menu,
   MessageCircle,
+  MoreVertical,
   Paperclip,
   Reply,
   Send,
+  Trash2,
   X,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -20,6 +22,7 @@ import {
   addTicketMessage,
   closeAllUserTickets,
   createTicket,
+  deleteTicketMessage,
   getUserTickets,
   listenToGlobalQueueStats,
   listenToTicketMessages,
@@ -215,6 +218,7 @@ export default function UserTicketDashboard({
   const [editingMessage, setEditingMessage] = useState<ChatMessage | null>(null);
 
   const [replyingTo, setReplyingTo] = useState<TicketMessage | null>(null);
+  const [messageMenuId, setMessageMenuId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [keepKeyboardOpen, setKeepKeyboardOpen] = useState(false);
   const [showChatView, setShowChatView] = useState(false);
@@ -790,10 +794,22 @@ export default function UserTicketDashboard({
 
   const canEditMessage = (message: TicketMessage) => {
     if (message.senderType !== "user") return false;
-    const t =
-      message.timestamp?.toDate?.().getTime() ??
-      (message.timestamp?.seconds ? message.timestamp.seconds * 1000 : 0);
-    return Date.now() - t < 10 * 60 * 1000;
+    if (message.id.startsWith("temp_") || message.id.startsWith("upload_")) return false;
+    return true;
+  };
+
+  const canDeleteMessage = (message: TicketMessage) => canEditMessage(message);
+
+  const handleDeleteMessage = async (message: TicketMessage) => {
+    if (!selectedTicket || !canDeleteMessage(message)) return;
+    setMessageMenuId(null);
+    try {
+      await deleteTicketMessage(userId, selectedTicket.ticketId, message.id);
+      setMessages((prev) => prev.filter((m) => m.id !== message.id));
+      toast.success("Message deleted");
+    } catch {
+      toast.error("Failed to delete message");
+    }
   };
 
   const isWordDocument = (url: string) => /\.(doc|docx)$/i.test(url);
@@ -1103,41 +1119,94 @@ export default function UserTicketDashboard({
                             {label}
                           </span>
                         </div>
-                        {list.map((message) => (
-                          <div
-                            key={message.id}
-                            className={`flex items-start ${message.senderType === "user" ? "justify-end" : "justify-start"} gap-2`}
-                          >
-                            {message.senderType === "user" && (
-                              <div className="mt-1 flex gap-1">
-                                <button
-                                  type="button"
-                                  className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                  onClick={() => setReplyingTo(message)}
-                                >
-                                  <Reply className="h-3.5 w-3.5" />
-                                </button>
-                                {canEditMessage(message) && (
+                        {list.map((message) => {
+                          const isOwn = message.senderType === "user";
+                          const showMenu = messageMenuId === message.id;
+                          const actions = (
+                            <div className="relative mt-1 flex shrink-0 gap-1">
+                              <button
+                                type="button"
+                                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                title="Reply"
+                                onClick={() => {
+                                  setReplyingTo(message);
+                                  setMessageMenuId(null);
+                                }}
+                              >
+                                <Reply className="h-3.5 w-3.5" />
+                              </button>
+                              {isOwn && (canEditMessage(message) || canDeleteMessage(message)) && (
+                                <div className="relative">
                                   <button
                                     type="button"
                                     className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                    onClick={() => {
-                                      setEditingMessage(message);
-                                      setNewMessage(message.message || "");
-                                    }}
+                                    title="More"
+                                    onClick={() =>
+                                      setMessageMenuId(showMenu ? null : message.id)
+                                    }
                                   >
-                                    <Edit2 className="h-3.5 w-3.5" />
+                                    <MoreVertical className="h-3.5 w-3.5" />
                                   </button>
-                                )}
-                              </div>
-                            )}
+                                  {showMenu && (
+                                    <div
+                                      className={`absolute z-20 min-w-[120px] rounded-xl border border-border bg-card py-1 shadow-md ${
+                                        isOwn ? "right-0" : "left-0"
+                                      } top-8`}
+                                    >
+                                      {canEditMessage(message) && (
+                                        <button
+                                          type="button"
+                                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-foreground hover:bg-muted"
+                                          onClick={() => {
+                                            setEditingMessage(message);
+                                            setNewMessage(message.message || "");
+                                            setMessageMenuId(null);
+                                          }}
+                                        >
+                                          <Edit2 className="h-3.5 w-3.5" />
+                                          Edit
+                                        </button>
+                                      )}
+                                      {canDeleteMessage(message) && (
+                                        <button
+                                          type="button"
+                                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-destructive hover:bg-muted"
+                                          onClick={() => void handleDeleteMessage(message)}
+                                        >
+                                          <Trash2 className="h-3.5 w-3.5" />
+                                          Delete
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+
+                          return (
+                          <div
+                            key={message.id}
+                            className={`flex items-start ${isOwn ? "justify-end" : "justify-start"} gap-2`}
+                          >
+                            {isOwn && actions}
                             <div
                               className={`relative max-w-[80%] rounded-2xl border p-3.5 text-foreground [&_img]:rounded-xl ${
-                                message.senderType === "user"
+                                isOwn
                                   ? "border-transparent bg-primary/15"
                                   : "border-border bg-muted"
                               }`}
                             >
+                              {message.replyTo && (
+                                <div className="mb-2 rounded-lg border border-border/60 bg-background/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                                  <p className="font-medium text-foreground/80">
+                                    {message.replyTo.senderName || "Reply"}
+                                  </p>
+                                  <p className="truncate">
+                                    {message.replyTo.message || "Attachment"}
+                                  </p>
+                                </div>
+                              )}
                               {message.type === "image" && Boolean(message.imageUrl) && (
                                 <img
                                   src={String(message.imageUrl)}
@@ -1178,12 +1247,15 @@ export default function UserTicketDashboard({
                               {(!message.type || message.type === "text") && message.message && (
                                 <MessageBody content={message.message} />
                               )}
-                              <div className="mt-1 text-right text-[11px] text-white/55">
-                                {formatTime(message.timestamp)}
+                              <div className="mt-1 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
+                                {message.edited ? <span>edited</span> : null}
+                                <span>{formatTime(message.timestamp)}</span>
                               </div>
                             </div>
+                            {!isOwn && actions}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ),
                   )}
@@ -1196,8 +1268,28 @@ export default function UserTicketDashboard({
               <div className="shrink-0 border-t border-border bg-card p-3 md:p-4">
                 {Boolean(replyingTo) && (
                   <div className="mb-2 flex items-start justify-between rounded-xl border border-border bg-muted p-2.5 text-xs text-muted-foreground">
-                    <span>Replying to legal team</span>
+                    <span>
+                      Replying to{" "}
+                      {replyingTo?.senderType === "user"
+                        ? "yourself"
+                        : replyingTo?.senderName || "legal team"}
+                      {replyingTo?.message ? `: “${replyingTo.message.slice(0, 60)}”` : ""}
+                    </span>
                     <button type="button" onClick={() => setReplyingTo(null)}>
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+                {Boolean(editingMessage) && (
+                  <div className="mb-2 flex items-start justify-between rounded-xl border border-border bg-muted p-2.5 text-xs text-muted-foreground">
+                    <span>Editing message</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingMessage(null);
+                        setNewMessage("");
+                      }}
+                    >
                       <X className="h-4 w-4" />
                     </button>
                   </div>

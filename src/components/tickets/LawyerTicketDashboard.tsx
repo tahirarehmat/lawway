@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { FileText, Home, Menu, MessageCircle, Send, X } from "lucide-react";
+import { FileText, Home, Menu, MessageCircle, MoreVertical, Reply, Send, Trash2, Edit2, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import {
   addTicketMessage,
+  deleteTicketMessage,
   listenToTicketMessages,
   listenToTicketsForLawyer,
   markLawyerInboxSeen,
@@ -103,6 +106,9 @@ export default function LawyerTicketDashboard({
   const [isCompact, setIsCompact] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<TicketMessage | null>(null);
+  const [editingMessage, setEditingMessage] = useState<TicketMessage | null>(null);
+  const [messageMenuId, setMessageMenuId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
@@ -183,6 +189,10 @@ export default function LawyerTicketDashboard({
     void markLawyerInboxSeen(clientId, selectedTicket.id).catch(() => {});
     setMessagesLoading(true);
     setMessages([]);
+    setReplyingTo(null);
+    setEditingMessage(null);
+    setMessageMenuId(null);
+    setNewMessage("");
     const u = listenToTicketMessages(clientId, ticketId, (newMsgs) => {
       setMessages(newMsgs);
       setMessagesLoading(false);
@@ -272,6 +282,10 @@ export default function LawyerTicketDashboard({
       toast.error("This thread is closed.");
       return;
     }
+    if (editingMessage) {
+      await handleEditMessage();
+      return;
+    }
     const clientUserId = selectedTicket.clientUserId;
     const ticketId = selectedTicket.ticketId;
     const messageText = newMessage.trim();
@@ -286,6 +300,17 @@ export default function LawyerTicketDashboard({
         message: messageText,
         isRead: false,
         type: "text" as const,
+        ...(replyingTo?.id && !replyingTo.id.startsWith("temp_")
+          ? {
+              replyTo: {
+                id: replyingTo.id,
+                message: replyingTo.message || "",
+                senderName: replyingTo.senderName || "",
+                senderType: replyingTo.senderType || "user",
+                imageUrls: replyingTo.imageUrls || [],
+              },
+            }
+          : {}),
       };
       const optimistic: TicketMessage = {
         id: "temp_" + Date.now(),
@@ -294,11 +319,8 @@ export default function LawyerTicketDashboard({
         timestamp: { seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 } as TicketMessage["timestamp"],
       };
       setMessages((m) => [...m, optimistic]);
-      await addTicketMessage(
-        clientUserId,
-        ticketId,
-        payload as Parameters<typeof addTicketMessage>[2],
-      );
+      await addTicketMessage(clientUserId, ticketId, payload);
+      setReplyingTo(null);
     } catch (err) {
       console.error(err);
       setNewMessage(messageText);
@@ -306,6 +328,60 @@ export default function LawyerTicketDashboard({
       setMessages((m) => m.filter((x) => !x.id.startsWith("temp_")));
     } finally {
       setSending(false);
+    }
+  };
+
+  const canEditMessage = (message: TicketMessage) => {
+    if (message.senderType !== "admin") return false;
+    if (message.id.startsWith("temp_")) return false;
+    return true;
+  };
+
+  const canDeleteMessage = (message: TicketMessage) => canEditMessage(message);
+
+  const handleEditMessage = async () => {
+    const em = editingMessage;
+    if (!em || !selectedTicket || !newMessage.trim()) return;
+    try {
+      const ref = doc(
+        db,
+        "chats",
+        selectedTicket.clientUserId,
+        "tickets",
+        selectedTicket.ticketId,
+        "messages",
+        em.id,
+      );
+      await updateDoc(ref, {
+        message: newMessage.trim(),
+        edited: true,
+      });
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === em.id ? { ...m, message: newMessage.trim(), edited: true } : m,
+        ),
+      );
+      setEditingMessage(null);
+      setNewMessage("");
+      toast.success("Message updated");
+    } catch {
+      toast.error("Update failed");
+    }
+  };
+
+  const handleDeleteMessage = async (message: TicketMessage) => {
+    if (!selectedTicket || !canDeleteMessage(message)) return;
+    setMessageMenuId(null);
+    try {
+      await deleteTicketMessage(
+        selectedTicket.clientUserId,
+        selectedTicket.ticketId,
+        message.id,
+      );
+      setMessages((prev) => prev.filter((m) => m.id !== message.id));
+      toast.success("Message deleted");
+    } catch {
+      toast.error("Failed to delete message");
     }
   };
 
@@ -445,18 +521,96 @@ export default function LawyerTicketDashboard({
                             {label}
                           </span>
                         </div>
-                        {list.map((message) => (
+                        {list.map((message) => {
+                          const isOwn = message.senderType === "admin";
+                          const showMenu = messageMenuId === message.id;
+                          const actions = (
+                            <div className="relative mt-1 flex shrink-0 gap-1">
+                              <button
+                                type="button"
+                                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                title="Reply"
+                                onClick={() => {
+                                  setReplyingTo(message);
+                                  setEditingMessage(null);
+                                  setMessageMenuId(null);
+                                }}
+                              >
+                                <Reply className="h-3.5 w-3.5" />
+                              </button>
+                              {isOwn && (canEditMessage(message) || canDeleteMessage(message)) && (
+                                <div className="relative">
+                                  <button
+                                    type="button"
+                                    className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    title="More"
+                                    onClick={() =>
+                                      setMessageMenuId(showMenu ? null : message.id)
+                                    }
+                                  >
+                                    <MoreVertical className="h-3.5 w-3.5" />
+                                  </button>
+                                  {showMenu && (
+                                    <div
+                                      className={`absolute z-20 min-w-[120px] rounded-xl border border-border bg-card py-1 shadow-md ${
+                                        isOwn ? "right-0" : "left-0"
+                                      } top-8`}
+                                    >
+                                      {canEditMessage(message) && (
+                                        <button
+                                          type="button"
+                                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-foreground hover:bg-muted"
+                                          onClick={() => {
+                                            setEditingMessage(message);
+                                            setNewMessage(message.message || "");
+                                            setReplyingTo(null);
+                                            setMessageMenuId(null);
+                                          }}
+                                        >
+                                          <Edit2 className="h-3.5 w-3.5" />
+                                          Edit
+                                        </button>
+                                      )}
+                                      {canDeleteMessage(message) && (
+                                        <button
+                                          type="button"
+                                          className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-destructive hover:bg-muted"
+                                          onClick={() => void handleDeleteMessage(message)}
+                                        >
+                                          <Trash2 className="h-3.5 w-3.5" />
+                                          Delete
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+
+                          return (
                           <div
                             key={message.id}
-                            className={`flex items-start ${message.senderType === "user" ? "justify-end" : "justify-start"} gap-2`}
+                            className={`flex items-start ${isOwn ? "justify-end" : "justify-start"} gap-2`}
                           >
+                            {isOwn && actions}
                             <div
                               className={`relative max-w-[80%] rounded-2xl border p-3.5 text-foreground [&_img]:rounded-xl ${
-                                message.senderType === "user"
-                                  ? "border-border bg-muted"
-                                  : "border-transparent bg-primary/15"
+                                isOwn
+                                  ? "border-transparent bg-primary/15"
+                                  : "border-border bg-muted"
                               }`}
                             >
+                              {message.replyTo && (
+                                <div className="mb-2 rounded-lg border border-border/60 bg-background/40 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                                  <p className="font-medium text-foreground/80">
+                                    {message.replyTo.senderName || "Reply"}
+                                  </p>
+                                  <p className="truncate">
+                                    {message.replyTo.message || "Attachment"}
+                                  </p>
+                                </div>
+                              )}
                               {message.type === "image" && Boolean(message.imageUrl) && (
                                 <img
                                   src={String(message.imageUrl)}
@@ -489,12 +643,15 @@ export default function LawyerTicketDashboard({
                               {(!message.type || message.type === "text") && message.message && (
                                 <MessageBody content={message.message} />
                               )}
-                              <div className="mt-1 text-right text-[11px] text-white/55">
-                                {formatTime(message.timestamp)}
+                              <div className="mt-1 flex items-center justify-end gap-1.5 text-[11px] text-muted-foreground">
+                                {message.edited ? <span>edited</span> : null}
+                                <span>{formatTime(message.timestamp)}</span>
                               </div>
                             </div>
+                            {!isOwn && actions}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ),
                   )}
@@ -504,16 +661,41 @@ export default function LawyerTicketDashboard({
             </div>
 
             {selectedTicket.status !== "closed" ? (
-              <form
-                onSubmit={handleSendMessage}
-                className="shrink-0 border-t border-border bg-card p-3 md:p-4"
-              >
-                <div className="flex items-end gap-2">
+              <div className="shrink-0 border-t border-border bg-card p-3 md:p-4">
+                {Boolean(replyingTo) && (
+                  <div className="mb-2 flex items-start justify-between rounded-xl border border-border bg-muted p-2.5 text-xs text-muted-foreground">
+                    <span>
+                      Replying to{" "}
+                      {replyingTo?.senderType === "admin"
+                        ? "yourself"
+                        : replyingTo?.senderName || "client"}
+                      {replyingTo?.message ? `: “${replyingTo.message.slice(0, 60)}”` : ""}
+                    </span>
+                    <button type="button" onClick={() => setReplyingTo(null)}>
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+                {Boolean(editingMessage) && (
+                  <div className="mb-2 flex items-start justify-between rounded-xl border border-border bg-muted p-2.5 text-xs text-muted-foreground">
+                    <span>Editing message</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingMessage(null);
+                        setNewMessage("");
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
+                <form onSubmit={handleSendMessage} className="flex items-end gap-2">
                   <textarea
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     rows={1}
-                    placeholder="Reply to your client…"
+                    placeholder={editingMessage ? "Edit your message…" : "Reply to your client…"}
                     className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/30"
                   />
                   <button
@@ -523,8 +705,8 @@ export default function LawyerTicketDashboard({
                   >
                     <Send className="h-5 w-5" />
                   </button>
-                </div>
-              </form>
+                </form>
+              </div>
             ) : (
               <div className="shrink-0 border-t border-border p-4 text-center text-sm text-muted-foreground">
                 This thread is closed.

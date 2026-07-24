@@ -282,7 +282,9 @@ export const updateTicketStatus = async (
 export const addTicketMessage = async (
   userId: string,
   ticketId: string,
-  messageData: Omit<TicketMessage, "id" | "messageId">,
+  messageData: Omit<TicketMessage, "id" | "messageId" | "timestamp"> & {
+    timestamp?: TicketMessage["timestamp"];
+  },
 ): Promise<string> => {
   try {
     const currentTimestamp = serverTimestamp();
@@ -502,6 +504,28 @@ export const deleteTicket = async (
     await deleteDoc(ticketRef);
   } catch (error) {
     console.error("Error deleting ticket:", error);
+    throw error;
+  }
+};
+
+export const deleteTicketMessage = async (
+  userId: string,
+  ticketId: string,
+  messageId: string,
+): Promise<void> => {
+  try {
+    const messageRef = doc(
+      db,
+      "chats",
+      userId,
+      "tickets",
+      ticketId,
+      "messages",
+      messageId,
+    );
+    await deleteDoc(messageRef);
+  } catch (error) {
+    console.error("Error deleting ticket message:", error);
     throw error;
   }
 };
